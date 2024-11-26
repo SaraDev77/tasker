@@ -1,5 +1,5 @@
 <template>
-  <aside class="min-h-screen bg-slate-100 w-1/6 flex flex-col">
+  <aside class="min-h-screen bg-slate-100 w-1/6 flex flex-col" v-if="largeAndXl">
     <div class="card flex justify-start">
       <div class="flex flex-col h-full w-full justify-between">
         <div class="flex items-center justify-between px-6 pt-4 shrink-0">
@@ -26,7 +26,6 @@
             <li class="w-full">
               <div
                 @click="toggleSection(!showFirstSection)"
-            
                 class="p-4 flex items-center justify-between text-sky-500 dark:text-sky-400 cursor-pointer p-ripple"
               >
                 <span class="font-medium">FAVORITES</span>
@@ -57,7 +56,7 @@
                 <div class="w-full" @click="toggleSecondSection(!showSecondSection)">
                   <a
                     v-ripple
-                    class="flex  justify-between cursor-pointer p-4 rounded text-sky-500 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 transition-colors p-ripple"
+                    class="flex justify-between cursor-pointer p-4 rounded text-sky-500 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 transition-colors p-ripple"
                   >
                     <span class="font-medium">Reports</span>
                     <i class="pi pi-chevron-right" v-if="!showSecondSection"></i>
@@ -119,7 +118,9 @@
 <script setup lang="ts">
 import { Avatar } from 'primevue'
 import { ref } from 'vue'
+import { useResponsiveBreakpoints } from '@/composables/Breakpoints'
 
+const { largeAndXl } = useResponsiveBreakpoints()
 const showFirstSection = ref(true)
 const showSecondSection = ref(true)
 const toggleSection = (show: boolean) => {
