@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import HomeComponent from '../components/HomeComponent.vue'
+import KnobComponent from '../components/KnobComponent.vue';
 
 </script>
 
 <template>
-  <main>
-   <div>this is home</div> 
-  </main>
+<KnobComponent/>
+  <HomeComponent />
 </template>
