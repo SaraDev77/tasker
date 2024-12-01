@@ -16,8 +16,8 @@
           class="mr-2 !bg-sky-700 hover:!bg-sky-600 !rounded-full"
       /></template>
     </Toolbar>
-    <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay" >
-    <FormComponent mode="add" :submit-action="handelAddingNewTask" :close-overlay="closeOverlay"/>
+    <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay">
+      <FormComponent mode="add" :close-overlay="closeOverlay" />
     </OverlayComponent>
   </div>
 </template>
@@ -26,14 +26,10 @@
 import { Button, IconField, InputIcon, InputText, Toolbar } from 'primevue'
 import { ref } from 'vue'
 import OverlayComponent from './OverlayComponent.vue'
-import FormComponent from './FormComponent.vue';
-// import { useTasksStore } from '../stores/tasks';
-// const tasks =useTasksStore()
-const handelAddingNewTask =()=>{
- console.log('object');
-}
-const closeOverlay=()=>{
-  showOverlay.value=false
+import FormComponent from './FormComponent.vue'
+
+const closeOverlay = () => {
+  showOverlay.value = false
 }
 const showOverlay = ref<boolean>(false)
 </script>
