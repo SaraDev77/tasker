@@ -30,11 +30,11 @@ import type { Task } from '../models/task.type'
 
 const props = defineProps<Task>()
 const emit = defineEmits<{
-  (e: 'deleteTask', id: number): void
+  (e: 'deleteTask', id: string): void
   (e: 'editTask'): void
 }>()
 
 const handlesDeleteClick = () => {
-  emit('deleteTask', props.id)
+  emit('deleteTask', props._id)
 }
 </script>

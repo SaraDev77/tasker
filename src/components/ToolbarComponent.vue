@@ -9,27 +9,31 @@
           <InputText placeholder="Search" />
         </IconField>
       </template>
-
       <template #end>
         <Button
-          @click="handleAdding"
+          @click="(showOverlay = true)"
           icon="pi pi-plus"
           class="mr-2 !bg-sky-700 hover:!bg-sky-600 !rounded-full"
       /></template>
     </Toolbar>
+    <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay" >
+    <FormComponent mode="add" :submit-action="handelAddingNewTask" :close-overlay="closeOverlay"/>
+    </OverlayComponent>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Button, IconField, InputIcon, InputText, Toolbar } from 'primevue'
 import { ref } from 'vue'
-
-const taskDetails = ref('')
-const emit = defineEmits<{
-  (e: 'newTask', data: string): void
-}>()
-function handleAdding() {
-  emit('newTask', taskDetails.value)
-  taskDetails.value = ''
+import OverlayComponent from './OverlayComponent.vue'
+import FormComponent from './FormComponent.vue';
+// import { useTasksStore } from '../stores/tasks';
+// const tasks =useTasksStore()
+const handelAddingNewTask =()=>{
+ console.log('object');
 }
+const closeOverlay=()=>{
+  showOverlay.value=false
+}
+const showOverlay = ref<boolean>(false)
 </script>
