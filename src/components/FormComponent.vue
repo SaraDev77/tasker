@@ -1,5 +1,5 @@
 <template>
-  <Form  :validation-schema="validationSchema" @submit="submitData">
+  <Form :validation-schema="validationSchema" @submit="submitData">
     <h1 v-if="mode === 'add'" class="font-bold text-xl text-slate-950 mb-4">Add New Task</h1>
     <h1 v-else class="font-bold text-xl text-slate-950 mb-4">Edit Task</h1>
 
@@ -87,16 +87,22 @@ const data = reactive<Task | TaskRequest>({
     email: props.initialData?.createdBy?.email || '27',
   },
 })
+
+
 const { mutate } = useMutation({
-  mutationFn:
-    props.mode === 'add'
-      ? tasksStore.createTask
-      : tasksStore.updateTask(data, props.initialData?._id),
-  onError: () => {
-    showErrToast()
+  mutationFn: (task: Task) => {
+    if (props.mode === 'add') {
+      return tasksStore.createTask(task)
+    } else {
+      return tasksStore.updateTask(task, props.initialData?._id)
+    }
   },
   onSuccess: () => {
-    queryClient.invalidateQueries(['tasks'])
+    if (props.mode === 'add') {
+      queryClient.invalidateQueries(['tasks'])
+    } else {
+      queryClient.invalidateQueries(['todo'])
+    }
     showSuccessToast()
     setTimeout(() => {
       props.closeOverlay()
@@ -121,14 +127,14 @@ const addSchema = z.object({
   status: z.string().min(1, 'Status is required'),
 })
 
-// Define the edit schema without the deadline field
+
 const editSchema = z.object({
   title: z.string().min(1, 'Task is required'),
   description: z.string().min(5, 'Description must be at least 5 characters'),
   status: z.string().min(1, 'Status is required'),
 })
 
-// Choose schema dynamically based on mode
+
 const validationSchema = toTypedSchema(props.mode === 'add' ? addSchema : editSchema)
 const toast = useToast()
 

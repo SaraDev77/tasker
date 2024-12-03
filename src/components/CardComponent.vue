@@ -5,7 +5,7 @@
     <template #content>
       <div class="min-w-full">
         <p class="m-0 break-words whitespace-normal">
-          {{ props.status }}
+          {{ props.status.charAt(0).toUpperCase()+props.status.slice(1).toLowerCase().replace("_"," ") }}
         </p>
       </div>
     </template>

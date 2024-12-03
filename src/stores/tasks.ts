@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Task } from '../models/task.type'
+import type { Task, TaskRequest } from '../models/task.type'
 import axios from 'axios'
 
 export const useTasksStore = defineStore('tasks', () => {
@@ -26,6 +26,20 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
+  const fetchSingleTask = async (id: string): Promise<TaskRequest> => {
+    try {
+      const { data } = await apiClient.get(`/api/todos/${id}`, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+        },
+      })
+
+      return data
+    } catch (error) {
+      console.error('Error fetching tasks:', error)
+      throw error
+    }
+  }
   const createTask = async (newTask: Omit<Task, '_id'>): Promise<void> => {
     try {
       await apiClient.post<Task>('/api/todos', newTask, {
@@ -39,7 +53,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const updateTask = async ( updates: Partial<Task>,id?: string): Promise<void> => {
+  const updateTask = async (updates: Partial<Task>, id?: string): Promise<void> => {
     try {
       await apiClient.put<Task>(`/api/todos/${id}`, updates, {
         headers: {
@@ -62,6 +76,7 @@ export const useTasksStore = defineStore('tasks', () => {
   }
 
   return {
+    fetchSingleTask,
     fetchTasks,
     createTask,
     updateTask,

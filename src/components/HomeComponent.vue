@@ -1,7 +1,10 @@
 <template>
   <div class="flex flex-col place-items-center lg:p-10 w-full p-5">
     <ToolbarComponent @search-tasks="onSearchTasks" />
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 w-full">
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 w-full"
+      v-if="displayedTasks.length > 0"
+    >
       <CardComponent
         v-for="task in displayedTasks"
         :key="task._id"
@@ -14,6 +17,7 @@
         @edit-task="displayOverlay(task)"
       />
     </div>
+    <div class="flex justify-center place-items-center" v-else><h2 class="text-2xl text-gray-900 text-bold">No Tasks Mathches This Search !</h2></div>
   </div>
   <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay">
     <FormComponent mode="edit" :close-overlay="closeOverlay" :initial-data="selectedTask" />
@@ -47,13 +51,12 @@ const showOverlay = ref<boolean>(false)
 const tasksStore = useTasksStore()
 
 const { data } = useQuery<Task[]>({
-  queryKey: ['todos', searchQuery.value],
+  queryKey: ['todos'],
   queryFn: tasksStore.fetchTasks,
 })
 
 const onSearchTasks = (value: string) => {
   searchQuery.value = value
-  console.log('Search query updated:', searchQuery.value)
 }
 const filtered = computed(() => {
   const term = searchQuery.value.toString().toLowerCase().trim()
@@ -63,7 +66,8 @@ const filtered = computed(() => {
 })
 
 const displayedTasks = computed(() => {
-  return filtered.value.length > 0 ? filtered.value : data.value || []
+  return filtered.value.length > 0 ? filtered.value :  []
 })
-onMounted(tasksStore.fetchTasks)
+
+onMounted(async () => {tasksStore.fetchTasks()})
 </script>
