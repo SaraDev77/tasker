@@ -29,7 +29,9 @@
       <div class="flex flex-col gap-2">
         <label for="status" :class="labelStyle">Status</label>
         <Field name="status" as="select" :class="fieldStyle" v-model="data.status">
-          <option v-for="option in options" :key="option" :value="option">{{ option }}</option>
+          <option v-for="option in options" :key="option" :value="option">
+            {{ option.charAt(0).toUpperCase() + option.slice(1).toLowerCase().replace('_', ' ') }}
+          </option>
         </Field>
         <ErrorMessage name="status" :class="errorStyle" />
       </div>
@@ -88,7 +90,6 @@ const data = reactive<Task | TaskRequest>({
   },
 })
 
-
 const { mutate } = useMutation({
   mutationFn: (task: Task) => {
     if (props.mode === 'add') {
@@ -127,13 +128,11 @@ const addSchema = z.object({
   status: z.string().min(1, 'Status is required'),
 })
 
-
 const editSchema = z.object({
   title: z.string().min(1, 'Task is required'),
   description: z.string().min(5, 'Description must be at least 5 characters'),
   status: z.string().min(1, 'Status is required'),
 })
-
 
 const validationSchema = toTypedSchema(props.mode === 'add' ? addSchema : editSchema)
 const toast = useToast()

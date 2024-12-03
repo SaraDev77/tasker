@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 import type { Task, TaskRequest } from '../models/task.type'
 import axios from 'axios'
+import { ref } from 'vue'
 
 export const useTasksStore = defineStore('tasks', () => {
   const apiClient = axios.create({
     baseURL: 'http://localhost:5000',
   })
 
+  const fetchedTask = ref<TaskRequest>()
   const fetchTasks = async (): Promise<Task[]> => {
     try {
       const { data } = await apiClient.get('/api/todos', {
@@ -26,17 +28,16 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const fetchSingleTask = async (id: string): Promise<TaskRequest> => {
+  const fetchSingleTask = async (id: string): Promise<TaskRequest|undefined> => {
     try {
       const { data } = await apiClient.get(`/api/todos/${id}`, {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
-        },
+        headers: { Authorization: `Bearer ${import.meta.env.VITE_TOKEN}` },
       })
+      fetchedTask.value = { ...data.todo }
 
-      return data
+      return fetchedTask.value
     } catch (error) {
-      console.error('Error fetching tasks:', error)
+      console.error('Error fetching single task:', error)
       throw error
     }
   }
@@ -81,5 +82,6 @@ export const useTasksStore = defineStore('tasks', () => {
     createTask,
     updateTask,
     deleteTask,
+    fetchedTask,
   }
 })

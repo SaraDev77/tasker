@@ -1,28 +1,35 @@
 <template>
-  <Card style="overflow: hidden" :class="[cardColor,'border border-slate-400']">
-    <template #title>{{ props.title }}</template>
-    <template #subtitle>{{ props.deadline }}</template>
-    <template #content>
-      <div class="min-w-full">
-        <p class="m-0 break-words whitespace-normal">
-          {{ props.status.charAt(0).toUpperCase()+props.status.slice(1).toLowerCase().replace("_"," ") }}
-        </p>
-      </div>
-    </template>
-    <template #footer>
-      <div class="flex gap-4 mt-1">
-        <Button label="Edit" class="w-full !bg-sky-700 hover:!bg-sky-600" @click="handlesEditClick" />
-        <Button
-          label="Delete"
-          severity="danger"
-          outlined
-          class="w-full"
-          @click="handlesDeleteClick"
-        />
-      </div>
-    </template>
-  </Card>
-  
+  <Card style="overflow: hidden" :class="[cardColor, 'border border-slate-400']">
+     <template #title>{{ props.title }}</template>
+      <template #subtitle>{{ props.deadline }}</template>
+      <template #content>
+        <RouterLink :to="`/details/${props._id}`"
+        >  <div class="min-w-full cursor-pointer">
+          <p class="m-0 break-words whitespace-normal">
+            {{
+              props.status.charAt(0).toUpperCase() +
+              props.status.slice(1).toLowerCase().replace('_', ' ')
+            }}
+          </p>
+        </div></RouterLink>
+      </template>
+      <template #footer>
+        <div class="flex gap-4 mt-1">
+          <Button
+            label="Edit"
+            class="w-full !bg-sky-700 hover:!bg-sky-600"
+            @click="handlesEditClick"
+          />
+          <Button
+            label="Delete"
+            severity="danger"
+            outlined
+            class="w-full"
+            @click="handlesDeleteClick"
+          />
+        </div>
+      </template> </Card
+  >
 </template>
 
 <script setup lang="ts">
@@ -32,7 +39,7 @@ import { Status } from '../models/status.enum'
 import { ref, watchEffect } from 'vue'
 const props = defineProps<Task>()
 const cardColor = ref('')
-watchEffect(()=>{
+watchEffect(() => {
   switch (props.status) {
     case Status.COMPLETED:
       cardColor.value = '!bg-green-50'
@@ -45,7 +52,8 @@ watchEffect(()=>{
       break
     default:
       cardColor.value = '!bg-gray-50'
-  }})
+  }
+})
 
 const emit = defineEmits<{
   (e: 'deleteTask'): void
