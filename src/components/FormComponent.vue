@@ -1,5 +1,5 @@
 <template>
-  <Form :validation-schema="validationSchema" @submit="submitData">
+  <Form  :validation-schema="validationSchema" @submit="submitData">
     <h1 v-if="mode === 'add'" class="font-bold text-xl text-slate-950 mb-4">Add New Task</h1>
     <h1 v-else class="font-bold text-xl text-slate-950 mb-4">Edit Task</h1>
 
@@ -11,7 +11,7 @@
         <hr />
       </div>
 
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2" v-if="props.mode === 'add'">
         <label for="deadline" :class="labelStyle">Deadline</label>
         <Field name="deadline" v-slot="{ field }">
           <DatePicker
@@ -42,7 +42,7 @@
       </div>
 
       <div class="flex justify-end gap-2 mt-6">
-        <Button class="!rounded-md !bg-sky-600 !border-none hover:!bg-sky-500" type="submit"
+        <Button class="!rounded-md !bg-sky-600 !border-none hover:!bg-sky-500" @click="submitData"
           >Submit</Button
         >
         <Button class="!rounded-md !bg-red-600 !border-none hover:!bg-red-500" @click="closeOverlay"
@@ -58,24 +58,26 @@
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import { Status } from '@/models/status.enum'
 import { reactive } from 'vue'
-import type { TaskRequest } from '../models/task.type'
+import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { Button, DatePicker, Toast } from 'primevue'
 import { useToast } from 'primevue/usetoast'
-import { useMutation } from '@tanstack/vue-query'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
 
+const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
 const props = defineProps<{
-  initialData?: Partial<TaskRequest>
+  initialData?: Partial<Task>
   mode: 'add' | 'edit'
   closeOverlay: () => void
 }>()
 
 const date = Date.now()
 const options = Object.values(Status)
-const data = reactive<TaskRequest>({
+const data = reactive<Task | TaskRequest>({
+  _id: props.initialData?._id,
   title: props.initialData?.title || '',
   deadline: props.initialData?.deadline || new Date(date).toISOString().split('T')[0],
   status: props.initialData?.status || Status.PENDING,
@@ -86,11 +88,15 @@ const data = reactive<TaskRequest>({
   },
 })
 const { mutate } = useMutation({
-  mutationFn: tasksStore.createTask,
+  mutationFn:
+    props.mode === 'add'
+      ? tasksStore.createTask
+      : tasksStore.updateTask(data, props.initialData?._id),
   onError: () => {
     showErrToast()
   },
   onSuccess: () => {
+    queryClient.invalidateQueries(['tasks'])
     showSuccessToast()
     setTimeout(() => {
       props.closeOverlay()
@@ -98,7 +104,7 @@ const { mutate } = useMutation({
   },
 })
 
-const schema = z.object({
+const addSchema = z.object({
   title: z.string().min(1, 'Task is required'),
   description: z.string().min(5, 'Description must be at least 5 characters'),
   deadline: z
@@ -110,17 +116,27 @@ const schema = z.object({
         }),
       z.date(),
     ])
-    .transform((value) => (value instanceof Date ? value.toISOString().split('T')[0] : value)),
+    .transform((value) => (typeof value === 'string' ? value : value.toISOString().split('T')[0]))
+    .optional(),
   status: z.string().min(1, 'Status is required'),
 })
-const validationSchema = toTypedSchema(schema)
+
+// Define the edit schema without the deadline field
+const editSchema = z.object({
+  title: z.string().min(1, 'Task is required'),
+  description: z.string().min(5, 'Description must be at least 5 characters'),
+  status: z.string().min(1, 'Status is required'),
+})
+
+// Choose schema dynamically based on mode
+const validationSchema = toTypedSchema(props.mode === 'add' ? addSchema : editSchema)
 const toast = useToast()
 
 const showErrToast = () => {
   toast.add({
     severity: 'error',
     summary: 'Error',
-    detail: 'Validation Failed cannot Submit!',
+    detail: 'An Error Occured could not Submit!',
     life: 3000,
   })
 }
@@ -134,16 +150,14 @@ const showSuccessToast = () => {
 }
 
 const submitData = () => {
-
-  const parsed = schema.safeParse(data);
-
+  const parsed = (props.mode === 'add' ? addSchema : editSchema).safeParse(data)
   if (parsed.success) {
-    mutate(data);
+    mutate(data)
   } else {
-    showErrToast();
-    console.error(parsed.error);
+    showErrToast()
+    console.error(parsed.error)
   }
-};
+}
 
 const fieldStyle = 'w-full h-14 border border-slate-200 p-4  block rounded-md'
 const labelStyle = 'text-gray-800 text-lg my-2'

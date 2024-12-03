@@ -2,7 +2,6 @@
 import { RouterView } from 'vue-router'
 import SidebarComponent from './components/SidebarComponent.vue'
 import 'primeicons/primeicons.css'
-import ToolbarComponent from './components/ToolbarComponent.vue';
 </script>
 
 <template>
@@ -12,7 +11,7 @@ import ToolbarComponent from './components/ToolbarComponent.vue';
         <RouterLink to="/about">About</RouterLink>
       </nav> -->
       <SidebarComponent />
-      <div class="flex flex-col w-full flex-1 overflow-y-auto "> <ToolbarComponent/>
+      <div class="flex flex-col w-full flex-1 overflow-y-auto ">
     <RouterView /></div>
      
   </main>

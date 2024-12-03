@@ -11,7 +11,7 @@
     </template>
     <template #footer>
       <div class="flex gap-4 mt-1">
-        <Button label="Edit" class="w-full !bg-sky-700 hover:!bg-sky-600" />
+        <Button label="Edit" class="w-full !bg-sky-700 hover:!bg-sky-600" @click="handlesEditClick" />
         <Button
           label="Delete"
           severity="danger"
@@ -22,6 +22,7 @@
       </div>
     </template>
   </Card>
+  
 </template>
 
 <script setup lang="ts">
@@ -47,11 +48,14 @@ watchEffect(()=>{
   }})
 
 const emit = defineEmits<{
-  (e: 'deleteTask', id: string): void
+  (e: 'deleteTask'): void
   (e: 'editTask'): void
 }>()
 
 const handlesDeleteClick = () => {
-  emit('deleteTask', props._id)
+  emit('deleteTask')
+}
+const handlesEditClick = () => {
+  emit('editTask')
 }
 </script>

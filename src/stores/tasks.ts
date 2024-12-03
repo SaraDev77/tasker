@@ -39,9 +39,13 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const updateTask = async (id: string, updates: Partial<Task>): Promise<void> => {
+  const updateTask = async ( updates: Partial<Task>,id?: string): Promise<void> => {
     try {
-      await apiClient.put<Task>(`/api/todos/${id}`, updates)
+      await apiClient.put<Task>(`/api/todos/${id}`, updates, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+        },
+      })
     } catch (error) {
       console.error('Error updating task:', error)
       throw error
