@@ -16,7 +16,7 @@
         <Field name="deadline" v-slot="{ field }">
           <DatePicker
             v-bind="field"
-            v-model="field.value"
+            v-model="dueDate"
             id="deadline"
             class="w-full border-2 rounded-md p-2"
             placeholder="Select a date"
@@ -59,7 +59,7 @@
 <script lang="ts" setup>
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import { Status } from '@/models/status.enum'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
@@ -67,6 +67,7 @@ import { Button, DatePicker, Toast } from 'primevue'
 import { useToast } from 'primevue/usetoast'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
+import { formateDate } from '../utils/date-formatter'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
@@ -76,12 +77,12 @@ const props = defineProps<{
   closeOverlay: () => void
 }>()
 
-const date = Date.now()
+const dueDate = ref()
 const options = Object.values(Status)
 const data = reactive<Task | TaskRequest>({
   _id: props.initialData?._id,
   title: props.initialData?.title || '',
-  deadline: props.initialData?.deadline || new Date(date).toISOString().split('T')[0],
+  deadline: props.initialData?.deadline ? formateDate(dueDate.value || new Date()) : '',
   status: props.initialData?.status || Status.PENDING,
   description: props.initialData?.description || '',
   createdBy: {
@@ -114,17 +115,7 @@ const { mutate } = useMutation({
 const addSchema = z.object({
   title: z.string().min(1, 'Task is required'),
   description: z.string().min(5, 'Description must be at least 5 characters'),
-  deadline: z
-    .union([
-      z
-        .string()
-        .refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(new Date(value).getTime()), {
-          message: 'Invalid date format or value. Use YYYY-MM-DD.',
-        }),
-      z.date(),
-    ])
-    .transform((value) => (typeof value === 'string' ? value : value.toISOString().split('T')[0]))
-    .optional(),
+  deadline: z.union([z.string().transform((value) => new Date(value)), z.date()]),
   status: z.string().min(1, 'Status is required'),
 })
 

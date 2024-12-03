@@ -28,7 +28,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const fetchSingleTask = async (id: string): Promise<TaskRequest|undefined> => {
+  const fetchSingleTask = async (id: string): Promise<TaskRequest | undefined> => {
     try {
       const { data } = await apiClient.get(`/api/todos/${id}`, {
         headers: { Authorization: `Bearer ${import.meta.env.VITE_TOKEN}` },
@@ -76,12 +76,39 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
+  const startTask = async (id: string): Promise<void> => {
+    try {
+      await apiClient.post<Task>(`/api/todos/${id}/start`, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+        },
+      })
+    } catch (error) {
+      console.error('Error creating task:', error)
+      throw error
+    }
+  }
+
+  const completeTask = async (id: string): Promise<void> => {
+    try {
+      await apiClient.post<Task>(`/api/todos/${id}/complete`, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+        },
+      })
+    } catch (error) {
+      console.error('Error creating task:', error)
+      throw error
+    }
+  }
   return {
     fetchSingleTask,
     fetchTasks,
     createTask,
     updateTask,
     deleteTask,
+    startTask,
+    completeTask,
     fetchedTask,
   }
 })
