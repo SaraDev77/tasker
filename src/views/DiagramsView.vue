@@ -19,8 +19,7 @@ const chartOptions = ref({})
 const tasksStore = useTasksStore()
 const { data: tasks, isLoading } = useQuery({
   queryKey: ['todos'],
-  queryFn: tasksStore.fetchTasks,
-  select: (data: Task[]) => data || [],
+  queryFn: tasksStore.fetchTasks
 })
 
 const computedChartData = computed(() => {
