@@ -4,6 +4,7 @@ import DetailsView from '../views/DetailsView.vue'
 import NotFound from '../views/NotFound.vue'
 import { useTasksStore } from '../stores/tasks'
 import DiagramsView from '../views/DiagramsView.vue'
+import LoginView from '../views/auth/LoginView.vue'
 const routeGuard: NavigationGuard = async (to, from, next) => {
   const { id } = to.params
   try {
@@ -15,8 +16,10 @@ const routeGuard: NavigationGuard = async (to, from, next) => {
     next({ name: 'not-found' })
   }
 }
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+
   routes: [
     {
       path: '/',
@@ -36,11 +39,27 @@ const router = createRouter({
       strict: true,
     },
     {
+      path: '/login',
+      name: 'login',
+      component: LoginView,
+      meta: { hideSidebar: true },
+    },
+    {
       name: 'not-found',
       path: '/:catchAll(.*)',
       component: NotFound,
     },
   ],
+})
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  if (to.name === 'login' || to.name === 'not-found') {
+    return next()
+  }
+  if (!token) {
+    return next({ name: 'login' })
+  }
+  next()
 })
 
 export default router

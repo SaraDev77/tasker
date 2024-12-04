@@ -13,10 +13,9 @@
 
       <div class="flex flex-col gap-2" v-if="props.mode === 'add'">
         <label for="deadline" :class="labelStyle">Deadline</label>
-        <Field name="deadline" v-slot="{ field }">
+        <Field name="deadline">
           <DatePicker
-            v-bind="field"
-            v-model="dueDate"
+            v-model="data.deadline"
             id="deadline"
             class="w-full border-2 rounded-md p-2"
             placeholder="Select a date"
@@ -59,7 +58,7 @@
 <script lang="ts" setup>
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import { Status } from '@/models/status.enum'
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Button, DatePicker, Toast } from 'primevue'
@@ -78,13 +77,12 @@ const props = defineProps<{
   closeOverlay: () => void
 }>()
 
-const dueDate = ref()
 const options = Object.values(Status)
 const data = reactive<Task | TaskRequest>({
   _id: props.initialData?._id,
   title: props.initialData?.title || '',
-  deadline: props.initialData?.deadline ? formateDate(dueDate.value || new Date()) : '',
   status: props.initialData?.status || Status.PENDING,
+  deadline:props.initialData?.deadline || new Date(),
   description: props.initialData?.description || '',
   createdBy: {
     _id: props.initialData?.createdBy?._id || 'sara@bright.com',
@@ -113,10 +111,6 @@ const { mutate } = useMutation({
   },
 })
 
-
-
-
-
 const validationSchema = toTypedSchema(props.mode === 'add' ? addSchema : editSchema)
 const toast = useToast()
 
@@ -138,7 +132,11 @@ const showSuccessToast = () => {
 }
 
 const submitData = () => {
-  const parsed = (props.mode === 'add' ? addSchema : editSchema).safeParse(data)
+  const parsedData = {
+    ...data,
+    deadline: data.deadline ? formateDate(new Date(data.deadline)) : null,
+  }
+  const parsed = (props.mode === 'add' ? addSchema : editSchema).safeParse(parsedData)
   if (parsed.success) {
     mutate(data)
   } else {

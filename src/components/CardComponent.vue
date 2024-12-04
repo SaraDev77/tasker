@@ -57,10 +57,10 @@ import { Button, Card, useToast } from 'primevue'
 import type { Task } from '../models/task.type'
 import { Status } from '../models/status.enum'
 import { ref, watchEffect } from 'vue'
-import { useMutation } from '@tanstack/vue-query'
-import { queryClient } from '../providers/queryClient'
-import { useTasksStore } from '../stores/tasks'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
+import { useTasksStore } from '../stores/tasks'
+const queryClient = useQueryClient()
 const props = defineProps<Task>()
 const cardColor = ref('')
 const toast = useToast()
@@ -110,14 +110,15 @@ const completed = () => {
 }
 const { mutate } = useMutation({
   mutationFn: () => {
-    if ((taskState.value === 'complete')) {
+    if (taskState.value === 'complete') {
       return tasksStore.completeTask(props._id)
-    } else if ((taskState.value === 'start')) {
+    } else if (taskState.value === 'start') {
       return tasksStore.startTask(props._id)
     }
   },
   onSuccess: () => {
-    queryClient.invalidateQueries(['tasks'])
+    console.log('changes')
+    queryClient.invalidateQueries(['todo'])
     showSuccessToast()
   },
   onError: () => {

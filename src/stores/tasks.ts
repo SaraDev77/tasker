@@ -1,26 +1,28 @@
 import { defineStore } from 'pinia'
 import type { Task, TaskRequest } from '../models/task.type'
-import axios from 'axios'
-
+import { useAuthStore } from './auth'
+import apiClient from '../interceptors/client'
 
 export const useTasksStore = defineStore('tasks', () => {
- 
-  const apiClient = axios.create({
-    baseURL: 'http://localhost:5000',
+  const authStore = useAuthStore()
+  apiClient.interceptors.request.use((config) => {
+    const authStore = useAuthStore()
+    config.headers.Authorization = `Bearer ${authStore.token}`
+    return config
   })
-
+  console.log(authStore.token)
   const fetchTasks = async (): Promise<Task[]> => {
     try {
       const { data } = await apiClient.get('/api/todos', {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+          Authorization: `Bearer ${authStore.token}`,
         },
         params: {
           page: 0,
           perPage: 100,
         },
       })
- 
+
       return data.todos
     } catch (error) {
       console.error('Error fetching tasks:', error)
@@ -31,7 +33,7 @@ export const useTasksStore = defineStore('tasks', () => {
   const fetchSingleTask = async (id: string): Promise<TaskRequest | undefined> => {
     try {
       const { data } = await apiClient.get(`/api/todos/${id}`, {
-        headers: { Authorization: `Bearer ${import.meta.env.VITE_TOKEN}` },
+        headers: { Authorization: `Bearer ${authStore.token}` },
       })
 
       return { ...data.todo }
@@ -44,7 +46,7 @@ export const useTasksStore = defineStore('tasks', () => {
     try {
       await apiClient.post<Task>('/api/todos', newTask, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+          Authorization: `Bearer  ${authStore.token}`,
         },
       })
     } catch (error) {
@@ -57,7 +59,7 @@ export const useTasksStore = defineStore('tasks', () => {
     try {
       await apiClient.put<Task>(`/api/todos/${id}`, updates, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+          Authorization: `Bearer  ${authStore.token}`,
         },
       })
     } catch (error) {
@@ -79,7 +81,7 @@ export const useTasksStore = defineStore('tasks', () => {
     try {
       await apiClient.post<Task>(`/api/todos/${id}/start`, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+          Authorization: `Bearer  ${authStore.token}`,
         },
       })
     } catch (error) {
@@ -92,7 +94,7 @@ export const useTasksStore = defineStore('tasks', () => {
     try {
       await apiClient.post<Task>(`/api/todos/${id}/complete`, {
         headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_TOKEN}`,
+          Authorization: `Bearer  ${authStore.token}`,
         },
       })
     } catch (error) {

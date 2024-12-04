@@ -63,27 +63,26 @@
         </div>
       </div>
     </div>
-    <div class="flex-1 flex flex-col justify-end">
+    <div class="flex-1 flex flex-col justify-end" >
       <hr class="mb-4 mx-4 border-t border-0 border-sky-200 dark:border-sky-700" />
       <a
-        v-ripple
+       @click="signOut"
         class="m-4 flex items-center cursor-pointer p-2 gap-2 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 transition-colors p-ripple"
       >
-        <Avatar
-          image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
-          shape="circle"
-        />
-        <span class="font-bold">Amy Elsner</span>
+        <i class="pi pi-sign-out text-sky-600"></i>
+        <span class="font-bold">Log out</span>
       </a>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { Avatar } from 'primevue'
+
 import { ref } from 'vue'
 import { useResponsiveBreakpoints } from '@/composables/useBreakpoints'
-
+import { useAuthStore } from '../stores/auth';
+const authStore=useAuthStore()
+const signOut=()=>authStore.localLogout()
 const { largeAndXl } = useResponsiveBreakpoints()
 const showFirstSection = ref(true)
 

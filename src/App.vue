@@ -10,7 +10,7 @@ import 'primeicons/primeicons.css'
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
       </nav> -->
-      <SidebarComponent />
+      <SidebarComponent  v-if="!$route.meta.hideSidebar"/>
       <div class="flex flex-col w-full flex-1 overflow-y-auto ">
     <RouterView /></div>
      
