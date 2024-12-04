@@ -62,12 +62,13 @@ import { Status } from '@/models/status.enum'
 import { reactive, ref } from 'vue'
 import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
-import { z } from 'zod'
 import { Button, DatePicker, Toast } from 'primevue'
 import { useToast } from 'primevue/usetoast'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
 import { formateDate } from '../utils/date-formatter'
+import { addSchema } from '../schemas/add-form.schema'
+import { editSchema } from '../schemas/edit-form.schema'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
@@ -112,18 +113,9 @@ const { mutate } = useMutation({
   },
 })
 
-const addSchema = z.object({
-  title: z.string().min(1, 'Task is required'),
-  description: z.string().min(5, 'Description must be at least 5 characters'),
-  deadline: z.union([z.string().transform((value) => new Date(value)), z.date()]),
-  status: z.string().min(1, 'Status is required'),
-})
 
-const editSchema = z.object({
-  title: z.string().min(1, 'Task is required'),
-  description: z.string().min(5, 'Description must be at least 5 characters'),
-  status: z.string().min(1, 'Status is required'),
-})
+
+
 
 const validationSchema = toTypedSchema(props.mode === 'add' ? addSchema : editSchema)
 const toast = useToast()
