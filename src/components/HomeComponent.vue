@@ -93,7 +93,7 @@ const { data } = useQuery<Task[]>({
 const onSearchTasks = (value: string) => {
   searchQuery.value = value
 }
-const filtered = computed(() => {
+const filteredTasksList = computed(() => {
   const term = searchQuery.value.toString().toLowerCase().trim()
   return data.value
     ? data.value.filter((task: Task) => task.title.toLowerCase().includes(term))
@@ -132,7 +132,7 @@ const showSuccessToast = () => {
   })
 }
 const displayedTasks = computed(() => {
-  return filtered.value.length > 0 ? filtered.value : []
+  return filteredTasksList.value.length > 0 ? filteredTasksList.value : []
 })
 
 onMounted(async () => {
