@@ -8,8 +8,8 @@ import App from './App.vue'
 import router from './router'
 import { DialogService, ToastService } from 'primevue'
 
-import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
-const queryClient = new QueryClient()
+import { VueQueryPlugin } from '@tanstack/vue-query'
+import { queryClient } from './providers/queryClient'
 
 const app = createApp(App)
 app.use(PrimeVue, {
@@ -21,5 +21,6 @@ app.use(createPinia())
 app.use(router)
 app.use(DialogService)
 app.use(ToastService)
-app.use(VueQueryPlugin, { queryClient })
+app.use(VueQueryPlugin)
+app.provide(VueQueryPlugin, { queryClient })
 app.mount('#app')
