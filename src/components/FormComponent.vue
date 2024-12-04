@@ -11,15 +11,10 @@
         <hr />
       </div>
 
-      <div class="flex flex-col gap-2" v-if="props.mode === 'add'">
+      <div class="flex flex-col gap-2">
         <label for="deadline" :class="labelStyle">Deadline</label>
         <Field name="deadline">
-          <DatePicker
-            v-model="data.deadline"
-            id="deadline"
-            class="w-full border-2 rounded-md p-2"
-            placeholder="Select a date"
-          />
+          <DatePicker v-model="data.deadline" placeholder="select a deadline"></DatePicker>
         </Field>
         <ErrorMessage name="deadline" :class="errorStyle" />
         <hr />
@@ -61,11 +56,11 @@ import { Status } from '@/models/status.enum'
 import { reactive } from 'vue'
 import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
-import { Button, DatePicker, Toast } from 'primevue'
+import { Button, Toast } from 'primevue'
+import DatePicker from 'primevue/datepicker'
 import { useToast } from 'primevue/usetoast'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
-import { formateDate } from '../utils/date-formatter'
 import { addSchema } from '../schemas/add-form.schema'
 import { editSchema } from '../schemas/edit-form.schema'
 
@@ -76,20 +71,18 @@ const props = defineProps<{
   mode: 'add' | 'edit'
   closeOverlay: () => void
 }>()
-
 const options = Object.values(Status)
 const data = reactive<Task | TaskRequest>({
   _id: props.initialData?._id,
   title: props.initialData?.title || '',
   status: props.initialData?.status || Status.PENDING,
-  deadline:props.initialData?.deadline || new Date(),
+  deadline: '',
   description: props.initialData?.description || '',
   createdBy: {
     _id: props.initialData?.createdBy?._id || 'sara@bright.com',
     email: props.initialData?.createdBy?.email || '27',
   },
 })
-
 const { mutate } = useMutation({
   mutationFn: (task: Task) => {
     if (props.mode === 'add') {
@@ -132,13 +125,13 @@ const showSuccessToast = () => {
 }
 
 const submitData = () => {
-  const parsedData = {
+  const parsedData: TaskRequest = {
     ...data,
-    deadline: data.deadline ? formateDate(new Date(data.deadline)) : null,
+    deadline:(new Date(data.deadline!))
   }
   const parsed = (props.mode === 'add' ? addSchema : editSchema).safeParse(parsedData)
   if (parsed.success) {
-    mutate(data)
+    mutate(parsedData)
   } else {
     showErrToast()
     console.error(parsed.error)

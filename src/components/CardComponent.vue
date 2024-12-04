@@ -4,14 +4,12 @@
       <div class="flex justify-between">
         {{ props.title }}
         <div class="flex gap-2">
-          <!-- Mark as In Progress Icon (Play Circle) -->
+
           <i
             @click="start"
             v-if="props.status === Status.PENDING"
             class="pi pi-play-circle text-green-400 cursor-pointer"
           ></i>
-
-          <!-- Mark as Completed Icon (Check Circle) -->
           <i
             @click="completed"
             v-if="props.status !== Status.COMPLETED"
@@ -20,7 +18,7 @@
         </div>
       </div>
     </template>
-    <template #subtitle>{{ props.deadline }}</template>
+    <template #subtitle>{{ props.deadline?.toString().split('T')[0] }}</template>
     <template #content>
       <RouterLink :to="`/details/${props._id}`">
         <div class="min-w-full cursor-pointer">

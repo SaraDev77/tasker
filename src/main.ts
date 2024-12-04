@@ -7,10 +7,15 @@ import Aura from '@primevue/themes/aura'
 import App from './App.vue'
 import router from './router'
 import { DialogService, ToastService } from 'primevue'
-
+import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { queryClient } from './providers/queryClient'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+
+
+
+
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -22,7 +27,7 @@ app.use(PrimeVue, {
 app.use(createPinia())
 
 pinia.use(piniaPluginPersistedstate)
-
+app.component('VueDatePicker', VueDatePicker);
 app.use(router)
 app.use(DialogService)
 app.use(ToastService)

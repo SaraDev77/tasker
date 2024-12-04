@@ -3,9 +3,9 @@ import type { Status } from './status.enum'
 export type Task = {
   _id: string
   title: string
-  description: string
+  description?: string
   status: Status
-  deadline: Date
+  deadline?: Date|string
   createdBy: {
     _id: string
     email: string
