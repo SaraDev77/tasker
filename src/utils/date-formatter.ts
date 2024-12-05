@@ -1,4 +1,5 @@
 export const formateDate = (date: Date) => {
+
   if (date)
   return date.toLocaleDateString('en-GB', {
     day: '2-digit',

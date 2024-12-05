@@ -30,7 +30,7 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const fetchSingleTask = async (id: string): Promise<TaskRequest | undefined> => {
+  const fetchSingleTask = async (id: string): Promise<TaskRequest > => {
     try {
       const { data } = await apiClient.get(`/api/todos/${id}`, {
         headers: { Authorization: `Bearer ${authStore.token}` },
@@ -42,7 +42,7 @@ export const useTasksStore = defineStore('tasks', () => {
       throw error
     }
   }
-  const createTask = async (newTask: Omit<Task, '_id'>): Promise<void> => {
+  const createTask = async (newTask: Partial<Task>): Promise<void> => {
     try {
       await apiClient.post<Task>('/api/todos', newTask, {
         headers: {

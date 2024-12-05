@@ -1,5 +1,5 @@
 <template>
-  <Card style="overflow: hidden" :class="[cardColor, 'border border-slate-400']">
+  <Card style="overflow: hidden" :class="[cardColor, 'border border-slate-400 !flex !flex-col !justify-between']">
     <template #title>
       <div class="flex justify-between">
         {{ props.title }}
@@ -18,7 +18,7 @@
         </div>
       </div>
     </template>
-    <template #subtitle>{{ props.deadline?.toString().split('T')[0] }}</template>
+    <template #subtitle><div >{{ props.deadline?.toString().split('T')[0] || 'No Due Date'}}</div></template>
     <template #content>
       <RouterLink :to="`/details/${props._id}`">
         <div class="min-w-full cursor-pointer">
@@ -32,7 +32,7 @@
       </RouterLink>
     </template>
     <template #footer>
-      <div class="flex gap-4 mt-1">
+      <div class="flex gap-4  mt-2">
         <Button
           label="Edit"
           class="w-full !bg-sky-700 hover:!bg-sky-600"
