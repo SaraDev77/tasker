@@ -79,8 +79,8 @@ const data = reactive<Task | TaskRequest>({
   deadline: '',
   description: props.initialData?.description || '',
   createdBy: {
-    _id: props.initialData?.createdBy?._id || 'sara@bright.com',
-    email: props.initialData?.createdBy?.email || '27',
+    _id: props.initialData?.createdBy?._id || '',
+    email: props.initialData?.createdBy?.email || '',
   },
 })
 const { mutate } = useMutation({
@@ -127,7 +127,7 @@ const showSuccessToast = () => {
 const submitData = () => {
   const parsedData: TaskRequest = {
     ...data,
-    deadline:(new Date(data.deadline!))
+    deadline: new Date(data.deadline!),
   }
   const parsed = (props.mode === 'add' ? addSchema : editSchema).safeParse(parsedData)
   if (parsed.success) {

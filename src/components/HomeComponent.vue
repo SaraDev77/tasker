@@ -1,4 +1,7 @@
 <template>
+    <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
+    <h1>Loading .....</h1>
+  </div>
   <div class="flex flex-col place-items-center lg:p-10 w-full p-5">
     <ToolbarComponent @search-tasks="onSearchTasks" />
     <div
@@ -85,7 +88,7 @@ const showWarningOverlay = ref<boolean>(false)
 const showOverlay = ref<boolean>(false)
 const tasksStore = useTasksStore()
 
-const { data } = useQuery<Task[]>({
+const { data ,isLoading} = useQuery<Task[]>({
   queryKey: ['todos'],
   queryFn: tasksStore.fetchTasks,
 })

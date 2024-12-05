@@ -19,13 +19,13 @@
       </div>
     </template>
     <template #subtitle><div >{{ props.deadline?.toString().split('T')[0] || 'No Due Date'}}</div></template>
-    <template #content>
+    <template #content v-if="props.status">
       <RouterLink :to="`/details/${props._id}`">
         <div class="min-w-full cursor-pointer">
           <p class="m-0 break-words whitespace-normal">
             {{
               props.status.charAt(0).toUpperCase() +
-              props.status.slice(1).toLowerCase().replace('_', ' ')
+              (props.status).slice(1).toLowerCase().replace('_', ' ')
             }}
           </p>
         </div>
