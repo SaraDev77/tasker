@@ -1,6 +1,7 @@
 <template>
-  <aside class="max-h-screen  bg-slate-100 w-1/6 flex flex-col shadow-md" v-if="largeAndXl">
-    <div class="card flex justify-start">
+  <aside class="max-h-screen  bg-slate-900 bg-opacity-25 w-2.5 flex flex-col shadow-md" @click="toggleShow"></aside>
+  <aside class="max-h-screen  bg-slate-100 lg:w-1/6 flex flex-col shadow-md z-10 md:relative" v-if="show" >
+    <div class="card flex justify-start" >
       <div class="flex flex-col h-full w-full justify-between">
         <div class="flex items-center justify-between px-6 pt-4 shrink-0">
           <span class="inline-flex items-center gap-2">
@@ -85,7 +86,8 @@ const authStore=useAuthStore()
 const signOut=()=>authStore.localLogout()
 const { largeAndXl } = useResponsiveBreakpoints()
 const showFirstSection = ref(true)
-
+const show =ref(false)
+const toggleShow=()=>show.value=!show.value
 const toggleSection = (show: boolean) => {
   showFirstSection.value = show
 }
