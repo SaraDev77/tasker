@@ -32,6 +32,7 @@
     <span v-if="props.mode === 'login'" class="mt-4 text-lg text-sky-600"
       ><RouterLink to="/register">Sign Up</RouterLink></span
     >
+    <span v-else class="mt-4 text-lg text-sky-600"><RouterLink to="/login">Login</RouterLink></span>
     <Toast />
   </div>
 </template>
