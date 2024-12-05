@@ -9,13 +9,14 @@ export const useAuthStore = defineStore(
   'auth-store',
   () => {
     const token = ref(localStorage.getItem('token') || '')
-
+    const loggedUser=ref(localStorage.getItem('email')||'')
     const isRouteAuthorized = (routeMeta: RouteMeta) => {
       return !routeMeta.permission
     }
 
     const login = async (formData: formData): Promise<void> => {
       try {
+        localStorage.setItem('email',formData.email)
         const response = await apiClient.post('/api/auth/login', formData)
         router.replace('/')
         token.value = response.data.accessToken
@@ -47,7 +48,8 @@ export const useAuthStore = defineStore(
       login,
       localLogout,
       isRouteAuthorized,
-      regestier
+      regestier,
+      loggedUser
     }
   },
   {

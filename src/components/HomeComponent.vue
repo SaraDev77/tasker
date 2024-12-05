@@ -2,7 +2,7 @@
     <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
     <h1>Loading .....</h1>
   </div>
-  <div class="flex flex-col place-items-center lg:p-10 w-full p-5">
+  <div class="flex flex-col place-items-center lg:p-10 w-full p-5 ">
     <ToolbarComponent @search-tasks="onSearchTasks" />
     <div
       class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 w-full"

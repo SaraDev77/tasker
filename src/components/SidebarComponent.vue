@@ -1,5 +1,5 @@
 <template>
-  <aside class="min-h-screen bg-slate-100 w-1/6 flex flex-col shadow-md" v-if="largeAndXl">
+  <aside class="max-h-screen  bg-slate-100 w-1/6 flex flex-col shadow-md" v-if="largeAndXl">
     <div class="card flex justify-start">
       <div class="flex flex-col h-full w-full justify-between">
         <div class="flex items-center justify-between px-6 pt-4 shrink-0">

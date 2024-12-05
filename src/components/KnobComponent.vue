@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-start gap-4 m-4">
+  <div class="flex lg:flex-row flex-col lg:items-center items-start lg:justify-start gap-4 m-4">
     <div class="flex flex-col justify-center items-center">
       <Knob
         :value="timerValue"
@@ -13,7 +13,7 @@
       />
       <p class="text-gray-400">Minutes left</p>
     </div>
-
+<div class="flex gap-4">
     <Button
       @click="startTimer"
       :disabled="isRunning"
@@ -30,7 +30,7 @@
     </Button>
     <Button @click="resetTimer" class="!bg-red-500 !text-white !px-4 !py-2 !border-none !rounded hover:!bg-red-600">
       Reset Timer
-    </Button>
+    </Button></div>
   </div>
 </template>
 

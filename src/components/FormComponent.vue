@@ -32,7 +32,11 @@
 
       <div class="flex flex-col gap-2">
         <label for="description" :class="labelStyle">Task Description</label>
-        <Field name="description" :class="[fieldStyle, '!h-24']" v-model="data.description" />
+        <Field
+          name="description"
+          :class="clsx(fieldStyle, '!h-24')"
+          v-model="data.description"
+        />
 
         <ErrorMessage name="description" :class="errorStyle" />
       </div>
@@ -63,9 +67,12 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
 import { addSchema } from '../schemas/add-form.schema'
 import { editSchema } from '../schemas/edit-form.schema'
+import clsx from 'clsx'
+import { useAuthStore } from '../stores/auth'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
+const authStore=useAuthStore()
 const props = defineProps<{
   initialData?: Partial<Task>
   mode: 'add' | 'edit'
@@ -79,8 +86,8 @@ const data = reactive<Task | TaskRequest>({
   deadline: '',
   description: props.initialData?.description || '',
   createdBy: {
-    _id: props.initialData?.createdBy?._id || '',
-    email: props.initialData?.createdBy?.email || '',
+    _id: props.initialData?.createdBy?._id || Date.now().toString(),
+    email: props.initialData?.createdBy?.email || authStore.loggedUser,
   },
 })
 const { mutate } = useMutation({

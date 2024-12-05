@@ -5,13 +5,9 @@ import 'primeicons/primeicons.css'
 </script>
 
 <template>
-  <main class="flex max-w-screen bg-slate-50 max-h-screen">
-    <!-- <nav class="bg-green-400">
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav> -->
+  <main class="flex max-w-screen bg-slate-50 h-screen ">
       <SidebarComponent  v-if="!$route.meta.hideSidebar"/>
-      <div class="flex flex-col w-full flex-1 overflow-y-auto ">
+      <div class="flex flex-col w-full flex-1 overflow-y-scroll ">
     <RouterView /></div>
      
   </main>
