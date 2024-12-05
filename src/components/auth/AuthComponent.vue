@@ -1,14 +1,15 @@
 <template>
-  <div class="min-h-screen w-full bg-sky-100 flex justify-center place-items-center">
-    <Form @submit="login" >
+  <div class="min-h-screen w-full bg-sky-100 flex flex-col justify-center place-items-center">
+    <Form @submit="login">
       <div class="flex flex-col gap-2 bg-slate-50 rounded-lg p-10 w-96">
         <h2 class="font-bold text-xl text-slate-950 mb-4 text-center">
-          <i class="pi pi-sign-in pr-2 text-sky-400"></i>Tasker Login
+          <i class="pi pi-sign-in pr-2 text-sky-400"></i>
+          {{ props.mode === 'login' ? 'Tasker Login' : 'Tasker Register' }}
         </h2>
         <div class="flex flex-col gap-6">
           <div class="flex flex-col gap-2">
             <label for="email" :class="labelStyle">Email</label>
-            <Field name="email" :class="fieldStyle" v-model="formInputs.email"  />
+            <Field name="email" :class="fieldStyle" v-model="formInputs.email" />
             <ErrorMessage name="email" :class="errorStyle" />
           </div>
           <div class="flex flex-col gap-2">
@@ -23,11 +24,14 @@
           </div>
 
           <Button class="!rounded-md !bg-sky-600 !border-none hover:!bg-sky-500" type="submit">
-            Login
+            {{ props.mode === 'login' ? 'Login' : 'Register' }}
           </Button>
         </div>
       </div>
     </Form>
+    <span v-if="props.mode === 'login'" class="mt-4 text-lg text-sky-600"
+      ><RouterLink to="/register">Sign Up</RouterLink></span
+    >
     <Toast />
   </div>
 </template>
@@ -39,7 +43,7 @@ import type { formData } from '../../models/auth.model'
 import { ref } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { loginSchema } from '../../schemas/login-form.schema'
-
+const props = defineProps<{ mode: 'login' | 'regestier' }>()
 const formInputs = ref<formData>({ email: '', password: '' })
 const authStore = useAuthStore()
 const toast = useToast()
@@ -57,14 +61,15 @@ const login = async () => {
   try {
     const parsedData = loginSchema.safeParse(formInputs.value)
     if (parsedData.success) {
-      await authStore.login(formInputs.value)
+      if (props.mode === 'login') await authStore.login(formInputs.value)
+      else await authStore.regestier(formInputs.value)
     } else {
       const errorDetails = parsedData.error.errors.map((err) => err.message).join(', ')
       showErrToast(`Validation Error: ${errorDetails}`)
     }
   } catch (err) {
     console.error('Login Error:', err)
-    showErrToast('An unexpected error occurred during login.')
+    showErrToast('An unexpected error occurred during submittion.')
   }
 }
 

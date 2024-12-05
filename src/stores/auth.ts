@@ -25,6 +25,17 @@ export const useAuthStore = defineStore(
       }
     }
 
+    const regestier = async (formData: formData): Promise<void> => {
+      try {
+        const response = await apiClient.post('/api/auth/register', formData)
+        router.replace('/login')
+        token.value = response.data.accessToken
+        localStorage.setItem('token', token.value)
+      } catch (error) {
+        throw error
+      }
+    }
+
     const localLogout = () => {
       token.value = ''
       localStorage.removeItem('token')
@@ -36,6 +47,7 @@ export const useAuthStore = defineStore(
       login,
       localLogout,
       isRouteAuthorized,
+      regestier
     }
   },
   {

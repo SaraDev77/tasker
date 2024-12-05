@@ -4,9 +4,9 @@ export type Task = {
   _id: string
   title: string
   description?: string
-  status: Status
+  status?: Status
   deadline?: Date|string
-  createdBy: {
+  createdBy?: {
     _id: string
     email: string
   }
