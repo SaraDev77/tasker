@@ -61,6 +61,7 @@ import { useUrlSearchParams } from '@vueuse/core'
 import ToolbarComponent from './ToolbarComponent.vue'
 import { Button, useToast } from 'primevue'
 import { queryClient } from '../providers/queryClient'
+import { Status } from '../models/status.enum'
 
 const toast = useToast()
 const params = useUrlSearchParams()
@@ -99,7 +100,7 @@ const onSearchTasks = (value: string) => {
 const filteredTasksList = computed(() => {
   const term = searchQuery.value.toString().toLowerCase().trim()
   return data.value
-    ? data.value.filter((task: Task) => task.title.toLowerCase().includes(term))
+    ? data.value.filter((task: Task) => task.title.toLowerCase().includes(term) && task.status!==Status.COMPLETED)
     : []
 })
 const confirmDelete = () => {
