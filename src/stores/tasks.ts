@@ -10,7 +10,6 @@ export const useTasksStore = defineStore('tasks', () => {
     config.headers.Authorization = `Bearer ${authStore.token}`
     return config
   })
-  console.log(authStore.token)
   const fetchTasks = async (): Promise<Task[]> => {
     try {
       const { data } = await apiClient.get('/api/todos', {
