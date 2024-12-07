@@ -115,7 +115,6 @@ const { mutate } = useMutation({
     }
   },
   onSuccess: () => {
-    console.log('changes')
     queryClient.invalidateQueries(['todo'])
     showSuccessToast()
   },

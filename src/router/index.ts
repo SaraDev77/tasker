@@ -12,7 +12,6 @@ const routeGuard: NavigationGuard = async (to, from, next) => {
   try {
     useTasksStore().fetchSingleTask(id.toString())
     next()
-    console.log('object')
   } catch (error) {
     console.error('Invalid Task ID:', error)
     next({ name: 'not-found' })

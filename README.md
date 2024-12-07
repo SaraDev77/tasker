@@ -1,39 +1,63 @@
-# tasker
 
-This template should help get you started developing with Vue 3 in Vite.
+# Tasker
 
-## Recommended IDE Setup
+Tasker is a task tracking app using vue js ,prime vue and pinia with tanstack for data management
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-## Type Support for `.vue` Imports in TS
+## API Reference
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+#### API base URL 
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```http
+  http://localhost:5000
 ```
 
-### Compile and Hot-Reload for Development
 
-```sh
-npm run dev
+
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`VITE_API_BASE_URL`
+
+
+
+
+## Features
+- Ability to register with a valid email and password
+- Ability to login with a valid email and password already registered before
+- Add tasks 
+- Edit tasks
+- Mark Tasks started to make them in progress status by clicking the start icon on the right of task's card
+- Mark them as completed to remove them from your list by clicking the check icon on the right of task's card 
+- Start , Stop and reset a one hour Timer to help you track your time 
+- A chart to show you the percentage of completed tasks vs the undone ones including the in progress tasks and pending ones 
+
+
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/SaraDev77/tasker.git
 ```
 
-### Type-Check, Compile and Minify for Production
+Go to the project directory
 
-```sh
-npm run build
+```bash
+  cd tasker
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+Install dependencies
 
-```sh
-npm run lint
+```bash
+  npm install
 ```
+
+Start the server
+
+```bash
+  npm run dev
+```
+
