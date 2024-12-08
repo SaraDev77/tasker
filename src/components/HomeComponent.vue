@@ -111,17 +111,20 @@ const filteredTasksList = computed(() => {
 const confirmDelete = () => {
   mutate(id.value)
 }
-const toast =useToast()
+const toast = useToast()
 const { mutate } = useMutation({
   mutationFn: (id: string) => {
     tasksStore.deleteTask(id)
   },
   onSuccess: () => {
     queryClient.invalidateQueries(['tasks'])
-    showSuccessToast(toast,'Form Submitted Successfully')
+    showSuccessToast(
+      toast,
+      'The API Request Successfully Sent Tho The Task Will Not Actually Be Deleted!',
+    )
   },
   onError: () => {
-    showErrToast(toast,'Form Submittion Failed !')
+    showErrToast(toast, 'An Error Ocurred !')
   },
 })
 
