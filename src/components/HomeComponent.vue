@@ -45,7 +45,7 @@
       </div>
     </div>
   </OverlayComponent>
-  <Toast />
+  <ToastComponent />
 </template>
 
 <script setup lang="ts">

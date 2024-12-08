@@ -32,12 +32,12 @@
       ><RouterLink to="/register">Sign Up</RouterLink></span
     >
     <span v-else class="mt-4 text-lg text-sky-600"><RouterLink to="/login">Login</RouterLink></span>
-    <Toast />
+    <ToastComponent />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, Toast, useToast } from 'primevue'
+import { Button, useToast } from 'primevue'
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
 import { ref } from 'vue'

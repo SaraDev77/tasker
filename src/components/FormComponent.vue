@@ -52,8 +52,7 @@
       </div>
     </div>
   </Form>
-  <Toast />
-</template>
+  <ToastComponent /></template>
 
 <script lang="ts" setup>
 import { Field, Form, ErrorMessage } from 'vee-validate'
@@ -61,7 +60,7 @@ import { Status } from '@/models/status.enum'
 import { reactive } from 'vue'
 import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
-import { Button, Toast, useToast } from 'primevue'
+import { Button,  useToast } from 'primevue'
 import DatePicker from 'primevue/datepicker'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
