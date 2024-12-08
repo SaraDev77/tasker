@@ -61,7 +61,7 @@ import { Status } from '@/models/status.enum'
 import { reactive } from 'vue'
 import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
-import { Button, Toast } from 'primevue'
+import { Button, Toast, useToast } from 'primevue'
 import DatePicker from 'primevue/datepicker'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
@@ -91,6 +91,8 @@ const data = reactive<Task | TaskRequest>({
     email: props.initialData?.createdBy?.email || authStore.loggedUser,
   },
 })
+const toast =useToast()
+
 const { mutate } = useMutation({
   mutationFn: (task: Task) => {
     if (props.mode === 'add') {
@@ -105,7 +107,7 @@ const { mutate } = useMutation({
     } else {
       queryClient.invalidateQueries(['todo'])
     }
-    showSuccessToast('Form Submitted Successfully!')
+    showSuccessToast(toast,'Form Submitted Successfully!')
     setTimeout(() => {
       props.closeOverlay()
     }, 2000)
@@ -123,7 +125,7 @@ const submitData = () => {
   if (parsed.success) {
     mutate(parsedData)
   } else {
-    showErrToast('Form Submittion Failed!')
+    showErrToast(toast,'Form Submittion Failed!')
     console.error(parsed.error)
   }
 }

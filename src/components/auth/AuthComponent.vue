@@ -37,8 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-
-import { Button, Toast } from 'primevue'
+import { Button, Toast, useToast } from 'primevue'
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
 import { ref } from 'vue'
@@ -49,6 +48,7 @@ import { showErrToast } from '../../utils/show-toasts'
 const props = defineProps<{ mode: 'login' | 'regestier' }>()
 const formInputs = ref<formData>({ email: '', password: '' })
 const authStore = useAuthStore()
+const toast = useToast()
 
 const login = async () => {
   try {
@@ -58,11 +58,11 @@ const login = async () => {
       else await authStore.regestier(formInputs.value)
     } else {
       const errorDetails = parsedData.error.errors.map((err) => err.message).join(', ')
-      showErrToast(`Validation Error: ${errorDetails}`)
+      showErrToast(toast, `Validation Error: ${errorDetails}`)
     }
   } catch (err) {
     console.error('Login Error:', err)
-    showErrToast('An unexpected error occurred during submittion.')
+    showErrToast(toast, 'An unexpected error occurred during submittion.')
   }
 }
 

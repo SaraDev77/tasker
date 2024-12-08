@@ -59,7 +59,7 @@ import OverlayComponent from './OverlayComponent.vue'
 import FormComponent from './FormComponent.vue'
 import { useUrlSearchParams } from '@vueuse/core'
 import ToolbarComponent from './ToolbarComponent.vue'
-import { Button } from 'primevue'
+import { Button, useToast } from 'primevue'
 import { queryClient } from '../providers/queryClient'
 import { Status } from '../models/status.enum'
 import { showErrToast, showSuccessToast } from '../utils/show-toasts'
@@ -111,17 +111,17 @@ const filteredTasksList = computed(() => {
 const confirmDelete = () => {
   mutate(id.value)
 }
-
+const toast =useToast()
 const { mutate } = useMutation({
   mutationFn: (id: string) => {
     tasksStore.deleteTask(id)
   },
   onSuccess: () => {
     queryClient.invalidateQueries(['tasks'])
-    showSuccessToast('Form Submitted Successfully')
+    showSuccessToast(toast,'Form Submitted Successfully')
   },
   onError: () => {
-    showErrToast('Form Submittion Failed !')
+    showErrToast(toast,'Form Submittion Failed !')
   },
 })
 
