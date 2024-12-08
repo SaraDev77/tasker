@@ -50,13 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card, useToast} from 'primevue'
+import { Button, Card} from 'primevue'
 import type { Task } from '../models/task.type'
 import { Status } from '../models/status.enum'
 import { ref, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
-import { showErrToast, showSuccessToast } from '../utils/show-toasts'
 
 const queryClient = useQueryClient()
 const props = defineProps<Task>()
@@ -88,8 +87,6 @@ const completed = () => {
   taskState.value = 'complete'
   mutate(props._id)
 }
-const toast =useToast()
-
 const { mutate } = useMutation({
   mutationFn: () => {
     if (taskState.value === 'complete') {
@@ -100,10 +97,8 @@ const { mutate } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries(['todo'])
-    showSuccessToast(toast,'Form submitted successfully!')
   },
   onError: () => {
-    showErrToast(toast,'An Error Ocurred, Sumbittion Failed!')
   },
 })
 
