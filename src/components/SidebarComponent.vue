@@ -1,7 +1,13 @@
 <template>
-  <aside class="max-h-screen  bg-slate-900 bg-opacity-25 w-2.5 flex flex-col shadow-md" @click="toggleShow"></aside>
-  <aside class="max-h-screen  bg-slate-100 lg:w-1/6 flex flex-col shadow-md z-10 md:relative" v-if="show" >
-    <div class="card flex justify-start" >
+  <aside
+    class="max-h-screen bg-slate-900 bg-opacity-25 w-2.5 flex flex-col shadow-md"
+    @click="toggleShow"
+  ></aside>
+  <aside
+    class="max-h-screen bg-slate-100 lg:w-1/6 flex flex-col shadow-md z-10 md:relative"
+    v-if="show"
+  >
+    <div class="card flex justify-start">
       <div class="flex flex-col h-full w-full justify-between">
         <div class="flex items-center justify-between px-6 pt-4 shrink-0">
           <span class="inline-flex items-center gap-2">
@@ -64,10 +70,10 @@
         </div>
       </div>
     </div>
-    <div class="flex-1 flex flex-col justify-end" >
+    <div class="flex-1 flex flex-col justify-end">
       <hr class="mb-4 mx-4 border-t border-0 border-sky-200 dark:border-sky-700" />
       <a
-       @click="signOut"
+        @click="signOut"
         class="m-4 flex items-center cursor-pointer p-2 gap-2 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 transition-colors p-ripple"
       >
         <i class="pi pi-sign-out text-sky-600"></i>
@@ -78,16 +84,15 @@
 </template>
 
 <script setup lang="ts">
-
 import { ref } from 'vue'
-import { useResponsiveBreakpoints } from '@/composables/useBreakpoints'
-import { useAuthStore } from '../stores/auth';
-const authStore=useAuthStore()
-const signOut=()=>authStore.localLogout()
-const { largeAndXl } = useResponsiveBreakpoints()
+import { useAuthStore } from '../stores/auth'
+
+const authStore = useAuthStore()
 const showFirstSection = ref(true)
-const show =ref(false)
-const toggleShow=()=>show.value=!show.value
+const show = ref(false)
+
+const signOut = () => authStore.localLogout()
+const toggleShow = () => (show.value = !show.value)
 const toggleSection = (show: boolean) => {
   showFirstSection.value = show
 }

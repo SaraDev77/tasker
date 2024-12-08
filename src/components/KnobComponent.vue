@@ -35,13 +35,13 @@
 </template>
 
 <script lang="ts" setup>
+
 import { Button, Knob } from 'primevue' 
 import { ref } from 'vue'
 
 const timerValue = ref(60) 
 const isRunning = ref(false) 
 let timerInterval: ReturnType<typeof setInterval> | null = null
-
 
 const startTimer = () => {
   if (!isRunning.value) {

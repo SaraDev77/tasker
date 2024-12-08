@@ -1,8 +1,8 @@
 <template>
-    <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
+  <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
     <h1>Loading .....</h1>
   </div>
-  <div class="flex flex-col place-items-center lg:p-10 w-full p-5 ">
+  <div class="flex flex-col place-items-center lg:p-10 w-full p-5">
     <ToolbarComponent @search-tasks="onSearchTasks" />
     <div
       class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 w-full"
@@ -59,15 +59,19 @@ import OverlayComponent from './OverlayComponent.vue'
 import FormComponent from './FormComponent.vue'
 import { useUrlSearchParams } from '@vueuse/core'
 import ToolbarComponent from './ToolbarComponent.vue'
-import { Button, useToast } from 'primevue'
+import { Button } from 'primevue'
 import { queryClient } from '../providers/queryClient'
 import { Status } from '../models/status.enum'
+import { showErrToast, showSuccessToast } from '../utils/show-toasts'
 
-const toast = useToast()
 const params = useUrlSearchParams()
 const searchQuery = ref(params.search || '')
 const selectedTask = ref<Task>()
-const id =ref<string>()
+const id = ref<string>()
+const showWarningOverlay = ref<boolean>(false)
+const showOverlay = ref<boolean>(false)
+const tasksStore = useTasksStore()
+
 const closeOverlay = () => {
   showOverlay.value = false
 }
@@ -82,14 +86,11 @@ const closeWarningOverlay = () => {
 }
 
 const displayWarningOverlay = (taskId: string) => {
-  id.value=taskId
+  id.value = taskId
   showWarningOverlay.value = true
 }
-const showWarningOverlay = ref<boolean>(false)
-const showOverlay = ref<boolean>(false)
-const tasksStore = useTasksStore()
 
-const { data ,isLoading} = useQuery<Task[]>({
+const { data, isLoading } = useQuery<Task[]>({
   queryKey: ['todos'],
   queryFn: tasksStore.fetchTasks,
 })
@@ -97,12 +98,16 @@ const { data ,isLoading} = useQuery<Task[]>({
 const onSearchTasks = (value: string) => {
   searchQuery.value = value
 }
+
 const filteredTasksList = computed(() => {
   const term = searchQuery.value.toString().toLowerCase().trim()
   return data.value
-    ? data.value.filter((task: Task) => task.title.toLowerCase().includes(term) && task.status!==Status.COMPLETED)
+    ? data.value.filter(
+        (task: Task) => task.title.toLowerCase().includes(term) && task.status !== Status.COMPLETED,
+      )
     : []
 })
+
 const confirmDelete = () => {
   mutate(id.value)
 }
@@ -113,28 +118,13 @@ const { mutate } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries(['tasks'])
-    showSuccessToast()
+    showSuccessToast('Form Submitted Successfully')
   },
   onError: () => {
-    showErrToast()
+    showErrToast('Form Submittion Failed !')
   },
 })
-const showErrToast = () => {
-  toast.add({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'An Error Occured could not Submit!',
-    life: 3000,
-  })
-}
-const showSuccessToast = () => {
-  toast.add({
-    severity: 'success',
-    summary: 'Succeeded!',
-    detail: 'Form Submitted Successfully!',
-    life: 3000,
-  })
-}
+
 const displayedTasks = computed(() => {
   return filteredTasksList.value.length > 0 ? filteredTasksList.value : []
 })

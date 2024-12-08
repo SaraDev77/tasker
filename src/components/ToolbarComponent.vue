@@ -24,18 +24,16 @@
 </template>
 
 <script setup lang="ts">
+
 import { Button, IconField, InputIcon, InputText, Toolbar } from 'primevue'
 import { computed, ref } from 'vue'
 import OverlayComponent from './OverlayComponent.vue'
 import FormComponent from './FormComponent.vue'
 import { useUrlSearchParams } from '@vueuse/core'
 
-const closeOverlay = () => {
-  showOverlay.value = false
-}
 const showOverlay = ref<boolean>(false)
-
 const params = useUrlSearchParams('history', { removeNullishValues: true })
+
 const searchQuery = computed({
   get: () => {
     const value = params.search
@@ -47,6 +45,9 @@ const searchQuery = computed({
   },
 })
 
+const closeOverlay = () => {
+  showOverlay.value = false
+}
 const emit = defineEmits<{
   (e: 'searchTasks', value: string): void
 }>()

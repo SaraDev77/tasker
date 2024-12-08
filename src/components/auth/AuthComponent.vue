@@ -22,7 +22,6 @@
             />
             <ErrorMessage name="password" :class="errorStyle" />
           </div>
-
           <Button class="!rounded-md !bg-sky-600 !border-none hover:!bg-sky-500" type="submit">
             {{ props.mode === 'login' ? 'Login' : 'Register' }}
           </Button>
@@ -38,25 +37,18 @@
 </template>
 
 <script lang="ts" setup>
-import { Button, Toast, useToast } from 'primevue'
+
+import { Button, Toast } from 'primevue'
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
 import { ref } from 'vue'
 import { useAuthStore } from '../../stores/auth'
 import { loginSchema } from '../../schemas/login-form.schema'
+import { showErrToast } from '../../utils/show-toasts'
+
 const props = defineProps<{ mode: 'login' | 'regestier' }>()
 const formInputs = ref<formData>({ email: '', password: '' })
 const authStore = useAuthStore()
-const toast = useToast()
-
-const showErrToast = (message: string) => {
-  toast.add({
-    severity: 'error',
-    summary: 'Error',
-    detail: message,
-    life: 3000,
-  })
-}
 
 const login = async () => {
   try {

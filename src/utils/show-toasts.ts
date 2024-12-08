@@ -1,0 +1,21 @@
+import { useToast } from 'primevue'
+
+const toast = useToast()
+
+export const showErrToast = (msg: string) => {
+  toast.add({
+    severity: 'error',
+    summary: 'Error',
+    detail: msg,
+    life: 3000,
+  })
+}
+
+export const showSuccessToast = (msg: string) => {
+  toast.add({
+    severity: 'success',
+    summary: 'Succeeded!',
+    detail: msg,
+    life: 3000,
+  })
+}

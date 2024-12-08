@@ -7,8 +7,6 @@
     >
       <div class="bg-gray-100 rounded-lg py-10 px-6 shadow-lg min-w-[30rem]">
         <slot></slot>
-
-   
       </div>
     </div>
   </Teleport>

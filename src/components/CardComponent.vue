@@ -4,7 +4,6 @@
       <div class="flex justify-between">
         {{ props.title }}
         <div class="flex gap-2">
-
           <i
             @click="start"
             v-if="props.status === Status.PENDING"
@@ -18,7 +17,7 @@
         </div>
       </div>
     </template>
-    <template #subtitle><div >{{ props.deadline?.toString().split('T')[0] || 'No Due Date'}}</div></template>
+    <template #subtitle><div>{{ props.deadline?.toString().split('T')[0] || 'No Due Date'}}</div></template>
     <template #content v-if="props.status">
       <RouterLink :to="`/details/${props._id}`">
         <div class="min-w-full cursor-pointer">
@@ -51,19 +50,20 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card, useToast } from 'primevue'
+import { Button, Card} from 'primevue'
 import type { Task } from '../models/task.type'
 import { Status } from '../models/status.enum'
 import { ref, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-
 import { useTasksStore } from '../stores/tasks'
+import { showErrToast, showSuccessToast } from '../utils/show-toasts'
+
 const queryClient = useQueryClient()
 const props = defineProps<Task>()
 const cardColor = ref('')
-const toast = useToast()
 const tasksStore = useTasksStore()
 const taskState = ref('')
+
 watchEffect(() => {
   switch (props.status) {
     case Status.COMPLETED:
@@ -79,24 +79,6 @@ watchEffect(() => {
       cardColor.value = '!bg-gray-50'
   }
 })
-
-const showErrToast = () => {
-  toast.add({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'An error occurred, could not submit!',
-    life: 3000,
-  })
-}
-
-const showSuccessToast = () => {
-  toast.add({
-    severity: 'success',
-    summary: 'Succeeded!',
-    detail: 'Form submitted successfully!',
-    life: 3000,
-  })
-}
 
 const start = () => {
   taskState.value = 'start'
@@ -116,10 +98,10 @@ const { mutate } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries(['todo'])
-    showSuccessToast()
+    showSuccessToast('Form submitted successfully!')
   },
   onError: () => {
-    showErrToast()
+    showErrToast('An Error Ocurred, Sumbittion Failed!')
   },
 })
 

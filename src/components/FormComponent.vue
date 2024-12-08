@@ -14,6 +14,7 @@
       <div class="flex flex-col gap-2">
         <label for="deadline" :class="labelStyle">Deadline</label>
         <Field name="deadline">
+          <!--This Err Doesn't really affect the app running it's resulted from the acceptance of the picker to dates only desn't get the initial value of the string of date format -->
           <DatePicker v-model="data.deadline" placeholder="select a deadline"></DatePicker>
         </Field>
         <ErrorMessage name="deadline" :class="errorStyle" />
@@ -62,13 +63,13 @@ import type { Task, TaskRequest } from '../models/task.type'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Button, Toast } from 'primevue'
 import DatePicker from 'primevue/datepicker'
-import { useToast } from 'primevue/usetoast'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
 import { addSchema } from '../schemas/add-form.schema'
 import { editSchema } from '../schemas/edit-form.schema'
 import clsx from 'clsx'
 import { useAuthStore } from '../stores/auth'
+import { showErrToast, showSuccessToast } from '../utils/show-toasts'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
@@ -104,7 +105,7 @@ const { mutate } = useMutation({
     } else {
       queryClient.invalidateQueries(['todo'])
     }
-    showSuccessToast()
+    showSuccessToast('Form Submitted Successfully!')
     setTimeout(() => {
       props.closeOverlay()
     }, 2000)
@@ -112,24 +113,6 @@ const { mutate } = useMutation({
 })
 
 const validationSchema = toTypedSchema(props.mode === 'add' ? addSchema : editSchema)
-const toast = useToast()
-
-const showErrToast = () => {
-  toast.add({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'An Error Occured could not Submit!',
-    life: 3000,
-  })
-}
-const showSuccessToast = () => {
-  toast.add({
-    severity: 'success',
-    summary: 'Succeeded!',
-    detail: 'Form Submitted Successfully!',
-    life: 3000,
-  })
-}
 
 const submitData = () => {
   const parsedData: TaskRequest = {
@@ -140,7 +123,7 @@ const submitData = () => {
   if (parsed.success) {
     mutate(parsedData)
   } else {
-    showErrToast()
+    showErrToast('Form Submittion Failed!')
     console.error(parsed.error)
   }
 }
