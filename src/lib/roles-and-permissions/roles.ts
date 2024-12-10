@@ -20,8 +20,8 @@ export const ROLES_DICTIONARY: Record<UserRole, Permission[]> = {
   ],
   [UserRole.ADMIN]: [
     { action: Action.CREATE },
-    { action: Action.DELETE },
     { action: Action.READ },
     { action: Action.UPDATE },
+
   ],
 }

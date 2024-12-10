@@ -1,5 +1,8 @@
 <template>
-  <Card style="overflow: hidden" :class="[cardColor, 'border border-slate-400 !flex !flex-col !justify-between']">
+  <Card
+    style="overflow: hidden"
+    :class="[cardColor, 'border border-slate-400 !flex !flex-col !justify-between']"
+  >
     <template #title>
       <div class="flex justify-between">
         {{ props.title }}
@@ -17,27 +20,30 @@
         </div>
       </div>
     </template>
-    <template #subtitle><div>{{ props.deadline?.toString().split('T')[0] || 'No Due Date'}}</div></template>
+    <template #subtitle
+      ><div>{{ props.deadline?.toString().split('T')[0] || 'No Due Date' }}</div></template
+    >
     <template #content v-if="props.status">
       <RouterLink :to="`/details/${props._id}`">
         <div class="min-w-full cursor-pointer">
           <p class="m-0 break-words whitespace-normal">
             {{
               props.status.charAt(0).toUpperCase() +
-              (props.status).slice(1).toLowerCase().replace('_', ' ')
+              props.status.slice(1).toLowerCase().replace('_', ' ')
             }}
           </p>
         </div>
       </RouterLink>
     </template>
     <template #footer>
-      <div class="flex gap-4  mt-2">
+      <div class="flex gap-4 mt-2">
         <Button
           label="Edit"
           class="w-full !bg-sky-700 hover:!bg-sky-600"
           @click="handlesEditClick"
         />
         <Button
+          v-if="authStore.ability?.can('delete', 'all')"
           label="Delete"
           severity="danger"
           outlined
@@ -50,17 +56,20 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card} from 'primevue'
+import { Button, Card } from 'primevue'
 import type { Task } from '../models/task.type'
 import { Status } from '../models/status.enum'
 import { ref, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useTasksStore } from '../stores/tasks'
+import { useAuthStore } from '../stores/auth'
 
 const queryClient = useQueryClient()
 const props = defineProps<Task>()
 const cardColor = ref('')
 const tasksStore = useTasksStore()
+const authStore = useAuthStore()
+
 const taskState = ref('')
 
 watchEffect(() => {
@@ -98,8 +107,7 @@ const { mutate } = useMutation({
   onSuccess: () => {
     queryClient.invalidateQueries(['todo'])
   },
-  onError: () => {
-  },
+  onError: () => {},
 })
 
 const emit = defineEmits<{
