@@ -1,7 +1,7 @@
 import type { UserRole } from './user-role.enum'
 
-export type DecodedToken = {
+export type User = {
+  email: string
+  token: string
   role: UserRole
-  exp: number
-  iat: number
 }

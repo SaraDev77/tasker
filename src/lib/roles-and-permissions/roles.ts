@@ -7,21 +7,25 @@ export enum Action {
   DELETE = 'delete',
 }
 
+export enum Resource {
+  TODOS = 'TODOS',
+}
+
 export type Permission = {
   action: Action
+  resource: Resource
 }
 
 export const ROLES_DICTIONARY: Record<UserRole, Permission[]> = {
   [UserRole.SUPER_ADMIN]: [
-    { action: Action.CREATE },
-    { action: Action.DELETE },
-    { action: Action.READ },
-    { action: Action.UPDATE },
+    { action: Action.CREATE, resource: Resource.TODOS },
+    { action: Action.READ, resource: Resource.TODOS },
+    { action: Action.UPDATE, resource: Resource.TODOS },
+    { action: Action.DELETE, resource: Resource.TODOS },
   ],
   [UserRole.ADMIN]: [
-    { action: Action.CREATE },
-    { action: Action.READ },
-    { action: Action.UPDATE },
-
+    { action: Action.CREATE, resource: Resource.TODOS },
+    { action: Action.READ, resource: Resource.TODOS },
+    { action: Action.UPDATE, resource: Resource.TODOS },
   ],
 }

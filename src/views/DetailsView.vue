@@ -6,14 +6,14 @@
     <h1
       class="text-gray-700 xl:text-2xl lg:text-lg text-md font-bold flex justify-center align-middle place-items-center gap-2"
     >
-      <GoTasklist class="h-12" />{{"Task Id No :"+ data?._id }}
+      <GoTasklist class="h-12" />{{ 'Task Id No :' + data?._id }}
     </h1>
 
     <div class="flex justify-center">
       <div
-        class="m-10 flex flex-col w-full min-h-full  rounded-3xl p-10 border-2 border-sky-800 border-opacity-25  gap-8 bg-slate-200"
+        class="m-10 flex flex-col w-full min-h-full rounded-3xl p-10 border-2 border-sky-800 border-opacity-25 gap-8 bg-slate-200"
       >
-        <div class="flex flex-wrap  align-middle justify-center xl:gap-4 gap-2">
+        <div class="flex flex-wrap align-middle justify-center xl:gap-4 gap-2">
           <h1 class="xl:text-2xl lg:text-lg text-md text-gray-900 font-bold">Task Name :</h1>
           <h1 class="xl:text-2xl lg:text-lg text-md text-gray-900 font-bold">
             {{ data?.title }}
@@ -26,15 +26,15 @@
         >
           <h1 class="xl:text-2xl lg:text-lg text-md text-gray-900 font-bold">Task Deadline :</h1>
           <h1 class="xl:text-2xl lg:text-lg text-md text-red-900 font-bold">
-            {{ data?.deadline?.toString().split('T')[0]  }}
+            {{ data?.deadline?.toString().split('T')[0] }}
           </h1>
         </div>
         <div class="flex justify-center align-middle place-items-center xl:gap-4 gap-2">
           <h1 class="xl:text-2xl lg:text-lg text-md text-gray-900 font-bold">Task Status :</h1>
           <h1 class="xl:text-2xl lg:text-lg text-md text-gray-900 font-bold">
             {{
-             data.status.charAt(0).toUpperCase() +
-             data.status.slice(1).toLowerCase().replace('_', ' ')
+              data.status.charAt(0).toUpperCase() +
+              data.status.slice(1).toLowerCase().replace('_', ' ')
             }}
           </h1>
         </div>
@@ -53,7 +53,7 @@ const taskId = route.params.id
 const taskStore = useTasksStore()
 
 const { data, isLoading } = useQuery({
-  queryKey: ['todo', taskId],
+  queryKey: ['tasks', taskId],
   queryFn: () => {
     return taskStore.fetchSingleTask(String(taskId))
   },

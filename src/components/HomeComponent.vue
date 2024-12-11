@@ -91,7 +91,7 @@ const displayWarningOverlay = (taskId: string) => {
 }
 
 const { data, isLoading } = useQuery<Task[]>({
-  queryKey: ['todos'],
+  queryKey: ['tasks'],
   queryFn: tasksStore.fetchTasks,
 })
 
@@ -117,7 +117,7 @@ const { mutate } = useMutation({
     tasksStore.deleteTask(id)
   },
   onSuccess: () => {
-    queryClient.invalidateQueries(['tasks'])
+    queryClient.invalidateQueries({ queryKey: ['tasks'] })
     showSuccessToast(
       toast,
       'The API Request Successfully Sent Tho The Task Will Not Actually Be Deleted!',
