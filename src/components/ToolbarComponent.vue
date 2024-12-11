@@ -18,18 +18,17 @@
       </template>
     </Toolbar>
     <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay">
-      <FormComponent mode="add" :close-overlay="closeOverlay" />
+      <AddFormComponent :close-overlay="closeOverlay" />
     </OverlayComponent>
   </div>
 </template>
 
 <script setup lang="ts">
-
 import { Button, IconField, InputIcon, InputText, Toolbar } from 'primevue'
 import { computed, ref } from 'vue'
 import OverlayComponent from './OverlayComponent.vue'
-import FormComponent from './FormComponent.vue'
 import { useUrlSearchParams } from '@vueuse/core'
+import AddFormComponent from './form/AddFormComponent.vue'
 
 const showOverlay = ref<boolean>(false)
 const params = useUrlSearchParams('history', { removeNullishValues: true })

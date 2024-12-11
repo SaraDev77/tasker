@@ -1,21 +1,11 @@
 import { defineStore } from 'pinia'
 import type { Task, TaskRequest } from '../models/task.type'
-import { useAuthStore } from './auth'
 import apiClient from '../interceptors/client'
 
 export const useTasksStore = defineStore('tasks', () => {
-  const authStore = useAuthStore()
-  apiClient.interceptors.request.use((config) => {
-    const authStore = useAuthStore()
-    config.headers.Authorization = `Bearer ${authStore.token}`
-    return config
-  })
   const fetchTasks = async (): Promise<Task[]> => {
     try {
       const { data } = await apiClient.get('/api/todos', {
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-        },
         params: {
           page: 0,
           perPage: 100,
@@ -29,11 +19,9 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const fetchSingleTask = async (id: string): Promise<TaskRequest > => {
+  const fetchSingleTask = async (id: string): Promise<TaskRequest> => {
     try {
-      const { data } = await apiClient.get(`/api/todos/${id}`, {
-        headers: { Authorization: `Bearer ${authStore.token}` },
-      })
+      const { data } = await apiClient.get(`/api/todos/${id}`)
 
       return { ...data.todo }
     } catch (error) {
@@ -43,11 +31,7 @@ export const useTasksStore = defineStore('tasks', () => {
   }
   const createTask = async (newTask: Partial<Task>): Promise<void> => {
     try {
-      await apiClient.post<Task>('/api/todos', newTask, {
-        headers: {
-          Authorization: `Bearer  ${authStore.token}`,
-        },
-      })
+      await apiClient.post<Task>('/api/todos', newTask)
     } catch (error) {
       console.error('Error creating task:', error)
       throw error
@@ -56,11 +40,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const updateTask = async (updates: Partial<Task>, id?: string): Promise<void> => {
     try {
-      await apiClient.put<Task>(`/api/todos/${id}`, updates, {
-        headers: {
-          Authorization: `Bearer  ${authStore.token}`,
-        },
-      })
+      await apiClient.put<Task>(`/api/todos/${id}`, updates)
     } catch (error) {
       console.error('Error updating task:', error)
       throw error
@@ -78,11 +58,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const startTask = async (id: string): Promise<void> => {
     try {
-      await apiClient.post<Task>(`/api/todos/${id}/start`, {
-        headers: {
-          Authorization: `Bearer  ${authStore.token}`,
-        },
-      })
+      await apiClient.post<Task>(`/api/todos/${id}/start`)
     } catch (error) {
       console.error('Error creating task:', error)
       throw error
@@ -91,11 +67,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
   const completeTask = async (id: string): Promise<void> => {
     try {
-      await apiClient.post<Task>(`/api/todos/${id}/complete`, {
-        headers: {
-          Authorization: `Bearer  ${authStore.token}`,
-        },
-      })
+      await apiClient.post<Task>(`/api/todos/${id}/complete`)
     } catch (error) {
       console.error('Error creating task:', error)
       throw error

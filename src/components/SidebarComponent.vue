@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '../stores/auth.store'
 
 const authStore = useAuthStore()
 const showFirstSection = ref(true)

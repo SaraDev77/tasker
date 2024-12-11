@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import Chart from 'primevue/chart'
 import { ref, computed } from 'vue'
-import { useTasksStore } from '../stores/tasks'
+import { useTasksStore } from '../stores/tasks.store'
 import { useQuery } from '@tanstack/vue-query'
 import type { Task } from '../models/task.type'
 import { Status } from '../models/status.enum'

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen w-full bg-sky-100 flex flex-col justify-center place-items-center">
-    <Form @submit="login">
+    <Form @submit="login" :validation-schema="validationSchema">
       <div class="flex flex-col gap-2 bg-slate-50 rounded-lg p-10 w-96">
         <h2 class="font-bold text-xl text-slate-950 mb-4 text-center">
           <i class="pi pi-sign-in pr-2 text-sky-400"></i>
@@ -41,21 +41,23 @@ import { Button, useToast } from 'primevue'
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
 import { ref } from 'vue'
-import { useAuthStore } from '../../stores/auth'
-import { loginSchema } from '../../schemas/login-form.schema'
+
 import { showErrToast } from '../../utils/show-toasts'
+import { useAuthStore } from '../../stores/auth.store'
+import { authSchema } from '../../schemas/auth-form.schema'
+import { toTypedSchema } from '@vee-validate/zod'
 
 const props = defineProps<{ mode: 'login' | 'regestier' }>()
 const formInputs = ref<formData>({ email: '', password: '' })
-const authStore = useAuthStore()
 const toast = useToast()
-
+const authStore = useAuthStore()
+const validationSchema = toTypedSchema(authSchema)
 const login = async () => {
   try {
-    const parsedData = loginSchema.safeParse(formInputs.value)
+    const parsedData = authSchema.safeParse(formInputs.value)
     if (parsedData.success) {
       if (props.mode === 'login') await authStore.login(formInputs.value)
-      else await authStore.regestier(formInputs.value)
+      else await authStore.register(formInputs.value)
     } else {
       const errorDetails = parsedData.error.errors.map((err) => err.message).join(', ')
       showErrToast(toast, `Validation Error: ${errorDetails}`)

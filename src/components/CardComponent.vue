@@ -21,7 +21,7 @@
       </div>
     </template>
     <template #subtitle
-      ><div>{{ props.deadline?.toString().split('T')[0] || 'No Due Date' }}</div></template
+      ><div v-formate-date="props.deadline!">{{ props.deadline || 'No Due Date' }}</div></template
     >
     <template #content v-if="props.status">
       <RouterLink :to="`/details/${props._id}`">
@@ -61,8 +61,9 @@ import { Button, Card } from 'primevue'
 import { ref, watchEffect } from 'vue'
 import { Status } from '../models/status.enum'
 import type { Task } from '../models/task.type'
-import { useAuthStore } from '../stores/auth'
-import { useTasksStore } from '../stores/tasks'
+import { useTasksStore } from '../stores/tasks.store'
+import { useAuthStore } from '../stores/auth.store'
+import { vFormateDate } from '../custom-directives/date-formate.directive'
 
 const queryClient = useQueryClient()
 const props = defineProps<Task>()

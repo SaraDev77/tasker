@@ -44,7 +44,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted } from 'vue'
-import { useTasksStore } from '../stores/tasks'
+import { useTasksStore } from '../stores/tasks.store'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 

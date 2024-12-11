@@ -17,7 +17,7 @@ export const useAuthStore = defineStore(
     const ability = ref<PureAbility>()
     const isAuthenticated = computed(() => !!user.value)
 
-    const setUser = (newUserValue: User) => {
+    const setUser = (newUserValue: User|null) => {
       user.value = newUserValue
       updatePermissions()
     }
@@ -96,6 +96,7 @@ export const useAuthStore = defineStore(
 
     return {
       user,
+      setUser,
       login,
       register,
       localLogout,

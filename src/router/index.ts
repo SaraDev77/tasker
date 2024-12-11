@@ -2,10 +2,11 @@ import { createRouter, createWebHistory, type NavigationGuard } from 'vue-router
 import HomeView from '../views/HomeView.vue'
 import DetailsView from '../views/DetailsView.vue'
 import NotFound from '../views/NotFound.vue'
-import { useTasksStore } from '../stores/tasks'
+import { useTasksStore } from '../stores/tasks.store'
 import DiagramsView from '../views/DiagramsView.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
+import { useAuthStore } from '../stores/auth.store'
 
 const routeGuard: NavigationGuard = async (to, from, next) => {
   const { id } = to.params
@@ -59,11 +60,11 @@ const router = createRouter({
   ],
 })
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+  const authStore = useAuthStore()
   if (to.name === 'login' || to.name === 'not-found' || to.name === 'register') {
     return next()
   }
-  if (!token) {
+  if (!authStore.user) {
     return next({ name: 'login' })
   }
   next()

@@ -13,7 +13,7 @@
         :key="task._id"
         :title="task.title"
         :status="task.status"
-        :deadline="task.deadline"
+        :deadline="new Date(task.deadline)"
         :description="task.description"
         :created-by="task.createdBy"
         :_id="task._id"
@@ -21,12 +21,15 @@
         @delete-task="displayWarningOverlay(task._id)"
       />
     </div>
-    <div class="flex justify-center place-items-center" v-else>
+    <div
+      class="flex justify-center place-items-center"
+      v-else-if="displayedTasks.length <= 0 && !isLoading"
+    >
       <h2 class="text-2xl text-gray-900 text-bold">No Tasks Mathches This Search !</h2>
     </div>
   </div>
   <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay">
-    <FormComponent mode="edit" :close-overlay="closeOverlay" :initial-data="selectedTask" />
+    <EditFormComponent  :close-overlay="closeOverlay" :initial-data="selectedTask!" />
   </OverlayComponent>
   <OverlayComponent :is-visible="showWarningOverlay" @closeOverlay="closeWarningOverlay">
     <div class="rounded-md flex flex-col justify-center place-items-center gap-4">
@@ -49,20 +52,20 @@
 </template>
 
 <script setup lang="ts">
-import { useTasksStore } from '../stores/tasks'
+import { useTasksStore } from '../stores/tasks.store'
 import CardComponent from './CardComponent.vue'
 import type { Task } from '../models/task.type'
 import { computed, onMounted } from 'vue'
 import { useMutation, useQuery } from '@tanstack/vue-query'
 import { ref } from 'vue'
 import OverlayComponent from './OverlayComponent.vue'
-import FormComponent from './FormComponent.vue'
 import { useUrlSearchParams } from '@vueuse/core'
 import ToolbarComponent from './ToolbarComponent.vue'
 import { Button, useToast } from 'primevue'
 import { queryClient } from '../providers/queryClient'
 import { Status } from '../models/status.enum'
 import { showErrToast, showSuccessToast } from '../utils/show-toasts'
+import EditFormComponent from './form/EditFormComponent.vue'
 
 const params = useUrlSearchParams()
 const searchQuery = ref(params.search || '')
