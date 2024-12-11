@@ -89,7 +89,7 @@ import { useAuthStore } from '../stores/auth.store'
 
 const authStore = useAuthStore()
 const showFirstSection = ref(true)
-const show = ref(false)
+const show = ref(true)
 
 const signOut = () => authStore.localLogout()
 const toggleShow = () => (show.value = !show.value)

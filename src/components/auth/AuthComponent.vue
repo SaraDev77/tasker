@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen w-full bg-sky-100 flex flex-col justify-center place-items-center">
-    <Form @submit="login" :validation-schema="validationSchema">
+    <Form @submit="authenticateUser" :validation-schema="validationSchema">
       <div class="flex flex-col gap-2 bg-slate-50 rounded-lg p-10 w-96">
         <h2 class="font-bold text-xl text-slate-950 mb-4 text-center">
           <i class="pi pi-sign-in pr-2 text-sky-400"></i>
@@ -41,8 +41,7 @@ import { Button, useToast } from 'primevue'
 import { Field, Form, ErrorMessage } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
 import { ref } from 'vue'
-
-import { showErrToast } from '../../utils/show-toasts'
+import { showErrToast } from '../../utils/show-toasts.util'
 import { useAuthStore } from '../../stores/auth.store'
 import { authSchema } from '../../schemas/auth-form.schema'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -52,7 +51,8 @@ const formInputs = ref<formData>({ email: '', password: '' })
 const toast = useToast()
 const authStore = useAuthStore()
 const validationSchema = toTypedSchema(authSchema)
-const login = async () => {
+
+const authenticateUser = async () => {
   try {
     const parsedData = authSchema.safeParse(formInputs.value)
     if (parsedData.success) {

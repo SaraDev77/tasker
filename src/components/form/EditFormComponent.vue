@@ -3,7 +3,6 @@
     :submit-data="submitData"
     :close-overlay="closeOverlay"
     :validation-schema="editSchema"
-    
   >
     <template #formTitle>
       <h1 class="font-bold text-xl text-slate-950 mb-4">Edit Task</h1>
@@ -11,7 +10,6 @@
     <template #title>
       <Field name="title" :class="fieldStyle" v-model="formData.title" />
       <ErrorMessage name="title" />
-
     </template>
     <template #deadline>
       <Field name="deadline">
@@ -45,7 +43,7 @@ import { reactive } from 'vue'
 import type { Task, TaskRequest } from '../../models/task.type'
 import { editSchema } from '../../schemas/edit-form.schema'
 import { useTasksStore } from '../../stores/tasks.store'
-import { showErrToast, showSuccessToast } from '../../utils/show-toasts'
+import { showErrToast, showSuccessToast } from '../../utils/show-toasts.util'
 import FormComponent from './FormComponent.vue'
 
 const queryClient = useQueryClient()
@@ -81,7 +79,7 @@ const submitData = () => {
     mutate(formData)
   } else {
     showErrToast(toast, 'Form Submittion Failed!')
-    console.error(parsed.error.name="title")
+    console.error((parsed.error.name = 'title'))
   }
 }
 

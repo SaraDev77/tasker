@@ -29,7 +29,7 @@
     </div>
   </div>
   <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay">
-    <EditFormComponent  :close-overlay="closeOverlay" :initial-data="selectedTask!" />
+    <EditFormComponent :close-overlay="closeOverlay" :initial-data="selectedTask!" />
   </OverlayComponent>
   <OverlayComponent :is-visible="showWarningOverlay" @closeOverlay="closeWarningOverlay">
     <div class="rounded-md flex flex-col justify-center place-items-center gap-4">
@@ -55,7 +55,7 @@
 import { useTasksStore } from '../stores/tasks.store'
 import CardComponent from './CardComponent.vue'
 import type { Task } from '../models/task.type'
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useMutation, useQuery } from '@tanstack/vue-query'
 import { ref } from 'vue'
 import OverlayComponent from './OverlayComponent.vue'
@@ -64,8 +64,11 @@ import ToolbarComponent from './ToolbarComponent.vue'
 import { Button, useToast } from 'primevue'
 import { queryClient } from '../providers/queryClient'
 import { Status } from '../models/status.enum'
-import { showErrToast, showSuccessToast } from '../utils/show-toasts'
+import { showErrToast, showSuccessToast } from '../utils/show-toasts.util'
 import EditFormComponent from './form/EditFormComponent.vue'
+import { useAuthStore } from '../stores/auth.store'
+import { UserRole } from '../models/user-role.enum'
+import { useDebounceFn } from '@vueuse/core'
 
 const params = useUrlSearchParams()
 const searchQuery = ref(params.search || '')
@@ -74,7 +77,7 @@ const id = ref<string>()
 const showWarningOverlay = ref<boolean>(false)
 const showOverlay = ref<boolean>(false)
 const tasksStore = useTasksStore()
-
+const authStore = useAuthStore()
 const closeOverlay = () => {
   showOverlay.value = false
 }
@@ -93,23 +96,26 @@ const displayWarningOverlay = (taskId: string) => {
   showWarningOverlay.value = true
 }
 
-const { data, isLoading } = useQuery<Task[]>({
-  queryKey: ['tasks'],
-  queryFn: tasksStore.fetchTasks,
-})
-
-const onSearchTasks = (value: string) => {
+const onSearchTasks = useDebounceFn((value: string) => {
   searchQuery.value = value
-}
+}, 1000)
 
-const filteredTasksList = computed(() => {
-  const term = searchQuery.value.toString().toLowerCase().trim()
-  return data.value
-    ? data.value.filter(
-        (task: Task) => task.title.toLowerCase().includes(term) && task.status !== Status.COMPLETED,
-      )
-    : []
+const { data, isLoading } = useQuery<Task[]>({
+  queryKey: ['tasks', searchQuery],
+  queryFn: tasksStore.fetchTasks,
+  select: (data: Task[]) => {
+    const uncompletedTasks = data.filter((task: Task) => task.status !== Status.COMPLETED)
+    const filteredTasks = searchQuery.value
+      ? data.filter((task: Task) =>
+          task.title.toLowerCase().includes(searchQuery.value.toString().toLowerCase()),
+        )
+      : data
+    return authStore.user?.role === UserRole.ADMIN
+      ? uncompletedTasks.filter((task) => filteredTasks.includes(task))
+      : filteredTasks
+  },
 })
+
 
 const confirmDelete = () => {
   mutate(id.value)
@@ -132,10 +138,6 @@ const { mutate } = useMutation({
 })
 
 const displayedTasks = computed(() => {
-  return filteredTasksList.value.length > 0 ? filteredTasksList.value : []
-})
-
-onMounted(async () => {
-  tasksStore.fetchTasks()
+  return data.value.length > 0 ? data.value : []
 })
 </script>

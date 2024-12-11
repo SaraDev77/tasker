@@ -43,7 +43,7 @@
           @click="handlesEditClick"
         />
         <Button
-          v-if="authStore.ability?.can('delete', 'all')"
+          v-if="authStore.ability?.can('delete', 'TODOS')"
           label="Delete"
           severity="danger"
           outlined
@@ -70,7 +70,6 @@ const props = defineProps<Task>()
 const cardColor = ref('')
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
-
 const taskState = ref('')
 
 watchEffect(() => {

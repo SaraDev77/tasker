@@ -1,5 +1,3 @@
-
-
 <template>
   <FormComponent
     :submit-data="submitData"
@@ -10,7 +8,7 @@
       <h1 class="font-bold text-xl text-slate-950 mb-4">Add New Task</h1>
     </template>
     <template #title>
-      <Field name="title" :class="fieldStyle" v-model="formData.title"  />
+      <Field name="title" :class="fieldStyle" v-model="formData.title" />
       <ErrorMessage name="title" :class="errorStyle" />
     </template>
     <template #deadline>
@@ -44,7 +42,7 @@ import { ErrorMessage, Field } from 'vee-validate'
 import { ref } from 'vue'
 import type { Task, TaskRequest } from '../../models/task.type'
 import { useTasksStore } from '../../stores/tasks.store'
-import { showErrToast, showSuccessToast } from '../../utils/show-toasts'
+import { showErrToast, showSuccessToast } from '../../utils/show-toasts.util'
 import FormComponent from './FormComponent.vue'
 import { addSchema } from '../../schemas/add-form.schema'
 
@@ -55,7 +53,7 @@ const statusOptions = Object.values(Status)
 const props = defineProps<{
   closeOverlay: () => void
 }>()
-const formData = ref<TaskRequest>({title:''})
+const formData = ref<TaskRequest>({ title: '' })
 const toast = useToast()
 
 const { mutate } = useMutation({
@@ -63,7 +61,7 @@ const { mutate } = useMutation({
     tasksStore.createTask(task)
   },
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['tasks'] })
     showSuccessToast(toast, 'Form Submitted Successfully, Your Task Is Added Yay!')
     setTimeout(() => {
       props.closeOverlay()

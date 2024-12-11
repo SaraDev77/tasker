@@ -1,4 +1,4 @@
-import type { DecodedToken } from '@/models/decoded-token'
+import type { DecodedToken } from '@/models/decoded-token.type'
 import type { User } from '@/models/user.model'
 import router from '@/router'
 import type { LoginResponse } from '@/views/auth/models/login-response.model'

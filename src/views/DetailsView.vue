@@ -4,11 +4,10 @@
   </div>
   <div v-else class="min-h-full min-w-full">
     <h1
-      class="text-gray-700 xl:text-2xl lg:text-lg text-md font-bold flex justify-center align-middle place-items-center gap-2"
+      class="text-gray-700 xl:text-2xl lg:text-lg text-md font-bold flex justify-center align-middle place-items-center gap-2 my-5"
     >
-      <GoTasklist class="h-12" />{{ 'Task Id No :' + data?._id }}
+      {{ 'Task Id No :' + data?._id }}
     </h1>
-
     <div class="flex justify-center">
       <div
         class="m-10 flex flex-col w-full min-h-full rounded-3xl p-10 border-2 border-sky-800 border-opacity-25 gap-8 bg-slate-200"
@@ -19,7 +18,6 @@
             {{ data?.title }}
           </h1>
         </div>
-
         <div
           class="flex flex-col justify-center align-middle place-items-center xl:gap-4 gap-2"
           v-if="data?.deadline"
@@ -43,7 +41,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted } from 'vue'
 import { useTasksStore } from '../stores/tasks.store'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
@@ -59,5 +56,4 @@ const { data, isLoading } = useQuery({
   },
 })
 
-onMounted(async () => taskStore.fetchSingleTask)
 </script>
