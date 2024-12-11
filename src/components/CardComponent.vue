@@ -56,13 +56,13 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card } from 'primevue'
-import type { Task } from '../models/task.type'
-import { Status } from '../models/status.enum'
-import { ref, watchEffect } from 'vue'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useTasksStore } from '../stores/tasks'
+import { Button, Card } from 'primevue'
+import { ref, watchEffect } from 'vue'
+import { Status } from '../models/status.enum'
+import type { Task } from '../models/task.type'
 import { useAuthStore } from '../stores/auth'
+import { useTasksStore } from '../stores/tasks'
 
 const queryClient = useQueryClient()
 const props = defineProps<Task>()
@@ -105,7 +105,7 @@ const { mutate } = useMutation({
     }
   },
   onSuccess: () => {
-    queryClient.invalidateQueries(['todo'])
+    queryClient.invalidateQueries({ queryKey: ['tasks'] })
   },
   onError: () => {},
 })

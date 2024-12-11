@@ -6,7 +6,7 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import App from './App.vue'
 import router from './router'
-import { DialogService, Toast, ToastService} from 'primevue'
+import { DialogService, Toast, ToastService } from 'primevue'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import { queryClient } from './providers/queryClient'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
@@ -20,19 +20,19 @@ app.use(PrimeVue, {
   },
 })
 
-app.use(createPinia())
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
 const authStore = useAuthStore()
 authStore.initializePermissions()
-const pinia = createPinia()
 app
   .use(abilitiesPlugin, authStore.ability!, { useGlobalProperties: true })
   .component(Can.name!, Can)
-pinia.use(piniaPluginPersistedstate)
 app.use(router)
 app.use(DialogService)
 app.use(ToastService)
 app.use(VueQueryPlugin)
 app.provide(VueQueryPlugin, { queryClient })
-app.use(ToastService);
-app.component('ToastComponent', Toast);
+app.use(ToastService)
+app.component('ToastComponent', Toast)
 app.mount('#app')

@@ -5,7 +5,7 @@ export type Task = {
   title: string
   description?: string
   status?: Status
-  deadline?: Date|string
+  deadline?: Date | string
   createdBy?: {
     _id: string
     email: string

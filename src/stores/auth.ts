@@ -1,27 +1,26 @@
-import { jwtDecode } from 'jwt-decode'
+import type { DecodedToken } from '@/models/decoded-token'
+import type { User } from '@/models/user.model'
 import router from '@/router'
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import type { RouteMeta } from 'vue-router'
-import type { formData } from '../models/auth.model'
-import apiClient from '../interceptors/client'
-import type { DecodedToken } from '../models/decoded-token'
+import type { LoginResponse } from '@/views/auth/models/login-response.model'
 import { defineAbility, type PureAbility } from '@casl/ability'
-import type { UserRole } from '../models/user-role.enum'
-import { ROLES_DICTIONARY } from '../lib/roles-and-permissions/roles'
-
+import { jwtDecode } from 'jwt-decode'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import type { RouteMeta } from 'vue-router'
+import apiClient from '../interceptors/client'
+import { ROLES_DICTIONARY, type Permission } from '../lib/roles-and-permissions/roles'
+import type { formData } from '../models/auth.model'
 export const useAuthStore = defineStore(
   'auth-store',
   () => {
-    const token = ref(localStorage.getItem('token') || '')
-    const loggedUser = ref(localStorage.getItem('email') || '')
-    const role = computed(() => {
-      const decoded: DecodedToken = jwtDecode(token.value)
-      return decoded.role
-    })
-
+    const user = ref<User | null>(null)
     const ability = ref<PureAbility>()
-    const isAuthenticated = computed(() => !!role.value)
+    const isAuthenticated = computed(() => !!user.value)
+
+    const setUser = (newUserValue: User) => {
+      user.value = newUserValue
+      updatePermissions()
+    }
 
     const initializePermissions = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -30,55 +29,75 @@ export const useAuthStore = defineStore(
     }
 
     const updatePermissions = () => {
-      const userRole = role.value as UserRole
+      const userRole = user.value?.role
       if (userRole) {
         ability.value?.update(
-          ROLES_DICTIONARY[userRole].map(({ action }) => {
-            return { action, subject: 'all' }
+          ROLES_DICTIONARY[userRole].map(({ action, resource }) => {
+            return { action, subject: resource }
           }),
         )
       }
     }
 
     const isRouteAuthorized = (routeMeta: RouteMeta) => {
-      return !routeMeta.permission
+      return (
+        !routeMeta.permission ||
+        ability.value?.can(
+          (routeMeta.permission as Permission).action,
+          (routeMeta.permission as Permission).resource,
+        )
+      )
     }
 
     const login = async (formData: formData): Promise<void> => {
       try {
-        localStorage.setItem('email', formData.email)
-        const response = await apiClient.post('/api/auth/login', formData)
+        const response = await apiClient.post<LoginResponse>('/api/auth/login', formData)
+        const decodedToken = jwtDecode<DecodedToken>(response.data.accessToken)
+        const loggedInUser: User = {
+          email: formData.email,
+          token: response.data.accessToken,
+          role: decodedToken.role,
+        }
+
+        setUser(loggedInUser)
+
         router.replace('/')
-        token.value = response.data.accessToken
-        localStorage.setItem('token', token.value)
       } catch (error) {
         throw error
       }
     }
 
-    const regestier = async (formData: formData): Promise<void> => {
+    const register = async (formData: formData): Promise<void> => {
       try {
         const response = await apiClient.post('/api/auth/register', formData)
-        router.replace('/login')
-        token.value = response.data.accessToken
-        localStorage.setItem('token', token.value)
+        const decodedToken = jwtDecode<DecodedToken>(response.data.accessToken)
+        const loggedInUser: User = {
+          email: formData.email,
+          token: response.data.accessToken,
+          role: decodedToken.role,
+        }
+
+        setUser(loggedInUser)
+        router.replace('/')
       } catch (error) {
         throw error
       }
     }
 
     const localLogout = () => {
-      token.value = ''
-      localStorage.removeItem('token')
+      resetTheStore()
       router.replace('/login')
     }
 
+    const resetTheStore = () => {
+      user.value = null
+      ability.value?.update([]) // Clear CASL abilities on logout
+    }
+
     return {
-      token,
-      loggedUser,
-      role,
+      user,
       login,
-      regestier,
+      register,
       localLogout,
       isRouteAuthorized,
       isAuthenticated,
@@ -87,6 +106,9 @@ export const useAuthStore = defineStore(
     }
   },
   {
-    persist: true,
+    persist: {
+      storage: localStorage,
+      pick: ['user'],
+    },
   },
 )

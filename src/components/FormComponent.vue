@@ -6,7 +6,7 @@
     <div class="flex flex-col gap-2">
       <div class="flex flex-col gap-2">
         <label for="title" :class="labelStyle">Title</label>
-        <Field name="title" :class="fieldStyle" v-model="data.title" />
+        <Field name="title" :class="fieldStyle" v-model="formData.title" />
         <ErrorMessage name="title" :class="errorStyle" />
         <hr />
       </div>
@@ -15,7 +15,7 @@
         <label for="deadline" :class="labelStyle">Deadline</label>
         <Field name="deadline">
           <!--This Err Doesn't really affect the app running it's resulted from the acceptance of the picker to dates only desn't get the initial value of the string of date format -->
-          <DatePicker v-model="data.deadline" placeholder="select a deadline"></DatePicker>
+          <DatePicker v-model="formData.deadline" placeholder="select a deadline"></DatePicker>
         </Field>
         <ErrorMessage name="deadline" :class="errorStyle" />
         <hr />
@@ -23,8 +23,8 @@
 
       <div class="flex flex-col gap-2">
         <label for="status" :class="labelStyle">Status</label>
-        <Field name="status" as="select" :class="fieldStyle" v-model="data.status">
-          <option v-for="option in options" :key="option" :value="option">
+        <Field name="status" as="select" :class="fieldStyle" v-model="formData.status">
+          <option v-for="option in statusOptions" :key="option" :value="option">
             {{ option.charAt(0).toUpperCase() + option.slice(1).toLowerCase().replace('_', ' ') }}
           </option>
         </Field>
@@ -36,7 +36,7 @@
         <Field
           name="description"
           :class="clsx(fieldStyle, '!h-24')"
-          v-model="data.description"
+          v-model="formData.description"
         />
 
         <ErrorMessage name="description" :class="errorStyle" />
@@ -52,45 +52,40 @@
       </div>
     </div>
   </Form>
-  <ToastComponent /></template>
+  <ToastComponent />
+</template>
 
 <script lang="ts" setup>
-import { Field, Form, ErrorMessage } from 'vee-validate'
 import { Status } from '@/models/status.enum'
+import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { toTypedSchema } from '@vee-validate/zod'
+import clsx from 'clsx'
+import { Button, useToast } from 'primevue'
+import DatePicker from 'primevue/datepicker'
+import { ErrorMessage, Field, Form } from 'vee-validate'
 import { reactive } from 'vue'
 import type { Task, TaskRequest } from '../models/task.type'
-import { toTypedSchema } from '@vee-validate/zod'
-import { Button,  useToast } from 'primevue'
-import DatePicker from 'primevue/datepicker'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { useTasksStore } from '../stores/tasks'
 import { addSchema } from '../schemas/add-form.schema'
 import { editSchema } from '../schemas/edit-form.schema'
-import clsx from 'clsx'
-import { useAuthStore } from '../stores/auth'
+import { useTasksStore } from '../stores/tasks'
 import { showErrToast, showSuccessToast } from '../utils/show-toasts'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
-const authStore=useAuthStore()
 const props = defineProps<{
   initialData?: Partial<Task>
   mode: 'add' | 'edit'
   closeOverlay: () => void
 }>()
-const options = Object.values(Status)
-const data = reactive<Task | TaskRequest>({
-  _id: props.initialData?._id,
+const statusOptions = Object.values(Status)
+
+const formData = reactive<TaskRequest>({
   title: props.initialData?.title || '',
   status: props.initialData?.status || Status.PENDING,
   deadline: '',
   description: props.initialData?.description || '',
-  createdBy: {
-    _id: props.initialData?.createdBy?._id || Date.now().toString(),
-    email: props.initialData?.createdBy?.email || authStore.loggedUser,
-  },
 })
-const toast =useToast()
+const toast = useToast()
 
 const { mutate } = useMutation({
   mutationFn: (task: Task) => {
@@ -101,12 +96,9 @@ const { mutate } = useMutation({
     }
   },
   onSuccess: () => {
-    if (props.mode === 'add') {
-      queryClient.invalidateQueries(['tasks'])
-    } else {
-      queryClient.invalidateQueries(['todo'])
-    }
-    showSuccessToast(toast,'Form Submitted Successfully!')
+    queryClient.invalidateQueries({ queryKey: ['tasks'] })
+
+    showSuccessToast(toast, 'Form Submitted Successfully!')
     setTimeout(() => {
       props.closeOverlay()
     }, 2000)
@@ -117,14 +109,14 @@ const validationSchema = toTypedSchema(props.mode === 'add' ? addSchema : editSc
 
 const submitData = () => {
   const parsedData: TaskRequest = {
-    ...data,
-    deadline: new Date(data.deadline!),
+    ...formData,
+    deadline: new Date(formData.deadline!),
   }
   const parsed = (props.mode === 'add' ? addSchema : editSchema).safeParse(parsedData)
   if (parsed.success) {
     mutate(parsedData)
   } else {
-    showErrToast(toast,'Form Submittion Failed!')
+    showErrToast(toast, 'Form Submittion Failed!')
     console.error(parsed.error)
   }
 }

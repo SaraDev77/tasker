@@ -15,11 +15,10 @@ import { Status } from '../models/status.enum'
 const chartData = ref({})
 const chartOptions = ref({})
 
-
 const tasksStore = useTasksStore()
 const { data: tasks, isLoading } = useQuery({
-  queryKey: ['todos'],
-  queryFn: tasksStore.fetchTasks
+  queryKey: ['tasks'],
+  queryFn: tasksStore.fetchTasks,
 })
 
 const computedChartData = computed(() => {
@@ -54,7 +53,6 @@ const computedChartData = computed(() => {
 })
 
 chartData.value = computedChartData.value
-
 
 chartOptions.value = (() => {
   const documentStyle = getComputedStyle(document.documentElement)
