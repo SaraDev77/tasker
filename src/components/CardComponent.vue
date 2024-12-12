@@ -8,11 +8,13 @@
         {{ props.title }}
         <div class="flex gap-2">
           <i
+            v-tooltip.top="'Make Task In Progress'"
             @click="start"
             v-if="props.status === Status.PENDING"
             class="pi pi-play-circle text-green-400 cursor-pointer"
           ></i>
           <i
+            v-tooltip.top="'Mark As Completed'"
             @click="completed"
             v-if="props.status !== Status.COMPLETED"
             class="pi pi-check-circle text-blue-600 cursor-pointer"
@@ -28,8 +30,7 @@
         <div class="min-w-full cursor-pointer">
           <p class="m-0 break-words whitespace-normal">
             {{
-              props.status.charAt(0).toUpperCase() +
-              props.status.slice(1).toLowerCase().replace('_', ' ')
+            formatStatus(props.status)
             }}
           </p>
         </div>
@@ -57,13 +58,15 @@
 
 <script setup lang="ts">
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { Button, Card } from 'primevue'
+import { Button, Card, useToast } from 'primevue'
 import { ref, watchEffect } from 'vue'
 import { Status } from '../models/status.enum'
 import type { Task } from '../models/task.type'
 import { useTasksStore } from '../stores/tasks.store'
 import { useAuthStore } from '../stores/auth.store'
 import { vFormateDate } from '../custom-directives/date-formate.directive'
+import { showSuccessToast } from '../utils/show-toasts.util'
+import { formatStatus } from '../utils/format-enum.util'
 
 const queryClient = useQueryClient()
 const props = defineProps<Task>()
@@ -71,6 +74,7 @@ const cardColor = ref('')
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
 const taskState = ref('')
+const toast = useToast()
 
 watchEffect(() => {
   switch (props.status) {
@@ -106,6 +110,12 @@ const { mutate } = useMutation({
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    showSuccessToast(
+      toast,
+      taskState.value === 'complete'
+        ? 'Wohooo You Completed One More Task 🎊🥳'
+        : 'Task Is Marked In Progress ⌛',
+    )
   },
   onError: () => {},
 })

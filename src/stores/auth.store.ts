@@ -58,9 +58,7 @@ export const useAuthStore = defineStore(
           token: response.data.accessToken,
           role: decodedToken.role,
         }
-
         setUser(loggedInUser)
-
         router.replace('/')
       } catch (error) {
         throw error
@@ -76,7 +74,6 @@ export const useAuthStore = defineStore(
           token: response.data.accessToken,
           role: decodedToken.role,
         }
-
         setUser(loggedInUser)
         router.replace('/')
       } catch (error) {
@@ -91,7 +88,7 @@ export const useAuthStore = defineStore(
 
     const resetTheStore = () => {
       user.value = null
-      ability.value?.update([]) // Clear CASL abilities on logout
+      ability.value?.update([]) 
     }
 
     return {

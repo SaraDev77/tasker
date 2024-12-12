@@ -7,7 +7,7 @@
       :options="chartOptions"
       class="w-full md:w-[30rem]"
     />
-    <div v-else class="text-gray-500">Loading chart...</div>
+    <div v-else class="min-h-full min-w-full flex justify-center place-items-center"><LoaderComponent/></div>
   </div>
 </template>
 
@@ -18,6 +18,7 @@ import { useTasksStore } from '../stores/tasks.store'
 import { useQuery } from '@tanstack/vue-query'
 import type { Task } from '../models/task.type'
 import { Status } from '../models/status.enum'
+import LoaderComponent from '../components/loader/LoaderComponent.vue'
 
 interface ChartData {
   labels: string[]

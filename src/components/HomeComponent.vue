@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
-    <h1>Loading .....</h1>
+  <LoaderComponent />
   </div>
   <div class="flex flex-col place-items-center lg:p-10 w-full p-5">
     <ToolbarComponent @search-tasks="onSearchTasks" />
@@ -61,6 +61,7 @@ import EditFormComponent from './form/EditFormComponent.vue'
 import { useAuthStore } from '../stores/auth.store'
 import { UserRole } from '../models/user-role.enum'
 import { useDebounceFn } from '@vueuse/core'
+import LoaderComponent from './loader/LoaderComponent.vue'
 
 const params = useUrlSearchParams()
 const searchQuery = ref(params.search || '')
@@ -118,7 +119,7 @@ const confirmDelete = async () => {
 const { mutate } = useMutation({
   mutationFn: async (taskId: string) => tasksStore.deleteTask(taskId),
   onSuccess: () => {
-    queryClient.invalidateQueries(['tasks'])
+    queryClient.invalidateQueries({ queryKey: ['tasks'] })
     showSuccessToast(toast, 'Task successfully deleted!')
     closeWarningOverlay()
   },

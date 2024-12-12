@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Task, TaskRequest } from '../models/task.type'
+import type { Task } from '../models/task.type'
 import apiClient from '../interceptors/client'
 
 export const useTasksStore = defineStore('tasks', () => {
@@ -11,7 +11,6 @@ export const useTasksStore = defineStore('tasks', () => {
           perPage: 100,
         },
       })
-
       return data.todos
     } catch (error) {
       console.error('Error fetching tasks:', error)
@@ -19,16 +18,19 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const fetchSingleTask = async (id: string): Promise<TaskRequest> => {
+  const fetchSingleTask = async (id: string) => {
     try {
       const { data } = await apiClient.get(`/api/todos/${id}`)
-
-      return { ...data.todo }
+      if (!data || !data.todo) {
+        throw new Error('Task data is missing')
+      }
+      return data.todo
     } catch (error) {
       console.error('Error fetching single task:', error)
-      throw error
+      throw new Error('Failed to fetch task')
     }
   }
+
   const createTask = async (newTask: Partial<Task>): Promise<void> => {
     try {
       await apiClient.post<Task>('/api/todos', newTask)
@@ -38,9 +40,9 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  const updateTask = async (updates: Partial<Task>, id?: string): Promise<void> => {
+  const updateTask = async (updatedTask: Partial<Task>, id?: string): Promise<void> => {
     try {
-      await apiClient.put<Task>(`/api/todos/${id}`, updates)
+      await apiClient.put<Task>(`/api/todos/${id}`, updatedTask)
     } catch (error) {
       console.error('Error updating task:', error)
       throw error

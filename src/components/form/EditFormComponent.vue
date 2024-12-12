@@ -39,7 +39,7 @@ import clsx from 'clsx'
 import { useToast } from 'primevue'
 import DatePicker from 'primevue/datepicker'
 import { ErrorMessage, Field } from 'vee-validate'
-import { reactive } from 'vue'
+import { ref } from 'vue'
 import type { Task, TaskRequest } from '../../models/task.type'
 import { editSchema } from '../../schemas/edit-form.schema'
 import { useTasksStore } from '../../stores/tasks.store'
@@ -53,7 +53,7 @@ const props = defineProps<{
   initialData: Task
   closeOverlay: () => void
 }>()
-const formData = reactive<TaskRequest>({
+const formData = ref<TaskRequest>({
   title: props.initialData?.title,
   status: props.initialData?.status,
   deadline: props.initialData?.deadline,
@@ -64,8 +64,11 @@ const { mutate } = useMutation({
   mutationFn: (task: Task) => {
     tasksStore.updateTask(task, props.initialData?._id)
   },
+  onSettled: () => {
+    queryClient.invalidateQueries('tasks');
+  },
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    queryClient.invalidateQueries('tasks');
     showSuccessToast(toast, 'Form Submitted Successfully!')
     setTimeout(() => {
       props.closeOverlay()
@@ -73,10 +76,10 @@ const { mutate } = useMutation({
   },
 })
 
-const parsed = editSchema.safeParse(formData)
+const parsed = editSchema.safeParse(formData.value)
 const submitData = () => {
   if (parsed.success) {
-    mutate(formData)
+    mutate(formData.value)
   } else {
     showErrToast(toast, 'Form Submittion Failed!')
     console.error((parsed.error.name = 'title'))
