@@ -33,6 +33,7 @@
 </template>
 
 <script lang="ts" setup>
+
 import { Status } from '@/models/status.enum'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import clsx from 'clsx'
@@ -59,7 +60,9 @@ const formData = ref<TaskRequest>({
   deadline: props.initialData?.deadline,
   description: props.initialData?.description,
 })
+const parsed = editSchema.safeParse(formData.value)
 const toast = useToast()
+
 const { mutate } = useMutation({
   mutationFn: (task: Task) => {
     tasksStore.updateTask(task, props.initialData?._id)
@@ -76,7 +79,6 @@ const { mutate } = useMutation({
   },
 })
 
-const parsed = editSchema.safeParse(formData.value)
 const submitData = () => {
   if (parsed.success) {
     mutate(formData.value)
