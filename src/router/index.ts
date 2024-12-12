@@ -13,13 +13,13 @@ const routeGuard: NavigationGuard = async (to, from, next) => {
   try {
     const response = await useTasksStore().fetchSingleTask(String(id));
     if (response) {
-      next(); // Allow navigation if task is found
+      next(); 
     } else {
-      next({ name: 'not-found' }); // Redirect to 'not-found' if no task is found
+      next({ name: 'not-found' }); 
     }
   } catch (error) {
     console.error('Invalid Task ID:', error);
-    next({ name: 'not-found' }); // Redirect to 'not-found' if an error occurs
+    next({ name: 'not-found' }); 
   }
 }
 
