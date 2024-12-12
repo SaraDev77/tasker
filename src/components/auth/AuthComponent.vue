@@ -54,19 +54,22 @@ const validationSchema = toTypedSchema(authSchema)
 
 const authenticateUser = async () => {
   try {
-    const parsedData = authSchema.safeParse(formInputs.value)
-    if (parsedData.success) {
-      if (props.mode === 'login') await authStore.login(formInputs.value)
-      else await authStore.register(formInputs.value)
-    } else {
-      const errorDetails = parsedData.error.errors.map((err) => err.message).join(', ')
-      showErrToast(toast, `Validation Error: ${errorDetails}`)
+    const parsedData = authSchema.safeParse(formInputs.value);
+
+    if (!parsedData.success) {
+      const errorDetails = parsedData.error.errors.map((err) => err.message).join(', ');
+      return showErrToast(toast, `Validation Error: ${errorDetails}`);
     }
+
+    const authAction = props.mode === 'login' ? authStore.login : authStore.register;
+    await authAction(formInputs.value);
+
   } catch (err) {
-    console.error('Login Error:', err)
-    showErrToast(toast, 'An unexpected error occurred during submittion.')
+    console.error('Authentication Error:', err);
+    showErrToast(toast, 'An unexpected error occurred during submission.');
   }
-}
+};
+
 
 const fieldStyle = 'w-full h-14 border border-slate-200 p-4  block rounded-md'
 const labelStyle = 'text-gray-800 text-lg my-2'
