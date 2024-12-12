@@ -1,6 +1,6 @@
 <template>
-  <AuthComponent mode="login" />
+  <LoginComponent/>
 </template>
 <script lang="ts" setup>
-import AuthComponent from '../../components/auth/AuthComponent.vue'
+import LoginComponent from '../../components/auth/LoginComponent.vue';
 </script>
