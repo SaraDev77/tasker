@@ -11,7 +11,7 @@ import { useAuthStore } from '../stores/auth.store'
 const routeGuard: NavigationGuard = async (to, from, next) => {
   const { id } = to.params
   try {
-    useTasksStore().fetchSingleTask(id.toString())
+    useTasksStore().fetchSingleTask(String(id))
     next()
   } catch (error) {
     console.error('Invalid Task ID:', error)

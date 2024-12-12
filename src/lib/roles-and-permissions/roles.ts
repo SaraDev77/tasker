@@ -5,7 +5,6 @@ export enum Action {
   READ = 'read',
   UPDATE = 'update',
   DELETE = 'delete',
-  VIEW_COMPLETED='view_completed'
 }
 
 export enum Resource {
@@ -23,7 +22,6 @@ export const ROLES_DICTIONARY: Record<UserRole, Permission[]> = {
     { action: Action.READ, resource: Resource.TODOS },
     { action: Action.UPDATE, resource: Resource.TODOS },
     { action: Action.DELETE, resource: Resource.TODOS },
-    { action: Action.VIEW_COMPLETED, resource: Resource.TODOS },
 
   ],
   [UserRole.ADMIN]: [

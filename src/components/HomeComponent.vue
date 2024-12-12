@@ -23,9 +23,9 @@
     </div>
     <div
       class="flex justify-center place-items-center"
-      v-else-if="displayedTasks.length <= 0 && !isLoading"
+      v-else-if="!isLoading"
     >
-      <h2 class="text-2xl text-gray-900 text-bold">No Tasks Mathches This Search !</h2>
+      <h2 class="text-2xl text-gray-900 text-bold">No Tasks Match This Search!</h2>
     </div>
   </div>
   <OverlayComponent :is-visible="showOverlay" @closeOverlay="closeOverlay">
@@ -34,17 +34,11 @@
   <OverlayComponent :is-visible="showWarningOverlay" @closeOverlay="closeWarningOverlay">
     <div class="rounded-md flex flex-col justify-center place-items-center gap-4">
       <h1 class="text-lg text-gray-800 font-semibold">
-        Are You Sure That You Want To Delete This Task !
+        Are you sure you want to delete this task?
       </h1>
-      <div class="flex gap-2 flex-end">
-        <Button @click="confirmDelete" class="!bg-red-600 !border-none !px-9 hover:!bg-red-500"
-          >Yes</Button
-        >
-        <Button
-          class="!bg-gray-200 !text-gray-800 !border-none hover:!bg-gray-300"
-          @click="closeWarningOverlay"
-          >Cancel</Button
-        >
+      <div class="flex gap-2">
+        <Button @click="confirmDelete" class="!bg-red-600 !border-none !px-9 hover:!bg-red-500">Yes</Button>
+        <Button class="!bg-gray-200 !text-gray-800 !border-none hover:!bg-gray-300" @click="closeWarningOverlay">Cancel</Button>
       </div>
     </div>
   </OverlayComponent>
@@ -55,9 +49,8 @@
 import { useTasksStore } from '../stores/tasks.store'
 import CardComponent from './CardComponent.vue'
 import type { Task } from '../models/task.type'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useMutation, useQuery } from '@tanstack/vue-query'
-import { ref } from 'vue'
 import OverlayComponent from './OverlayComponent.vue'
 import { useUrlSearchParams } from '@vueuse/core'
 import ToolbarComponent from './ToolbarComponent.vue'
@@ -72,12 +65,14 @@ import { useDebounceFn } from '@vueuse/core'
 
 const params = useUrlSearchParams()
 const searchQuery = ref(params.search || '')
-const selectedTask = ref<Task>()
-const id = ref<string>()
+const selectedTask = ref<Task | null>(null)
+const id = ref<string | null>(null)
 const showWarningOverlay = ref<boolean>(false)
 const showOverlay = ref<boolean>(false)
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
+const toast = useToast()
+
 const closeOverlay = () => {
   showOverlay.value = false
 }
@@ -100,44 +95,38 @@ const onSearchTasks = useDebounceFn((value: string) => {
   searchQuery.value = value
 }, 1000)
 
-const { data, isLoading } = useQuery<Task[]>({
-  queryKey: ['tasks', searchQuery],
+const { data, isLoading } = useQuery({
+  queryKey: computed(() => ['tasks', searchQuery.value]),
   queryFn: tasksStore.fetchTasks,
   select: (data: Task[]) => {
-    const uncompletedTasks = data.filter((task: Task) => task.status !== Status.COMPLETED)
     const filteredTasks = searchQuery.value
-      ? data.filter((task: Task) =>
+      ? data.filter((task) =>
           task.title.toLowerCase().includes(searchQuery.value.toString().toLowerCase()),
         )
       : data
+
     return authStore.user?.role === UserRole.ADMIN
-      ? uncompletedTasks.filter((task) => filteredTasks.includes(task))
+      ? filteredTasks.filter((task) => task.status !== Status.COMPLETED)
       : filteredTasks
   },
 })
 
-
-const confirmDelete = () => {
+const confirmDelete = async () => {
+  if (!id.value) return
   mutate(id.value)
 }
-const toast = useToast()
+
 const { mutate } = useMutation({
-  mutationFn: (id: string) => {
-    tasksStore.deleteTask(id)
-  },
+  mutationFn: async (taskId: string) => tasksStore.deleteTask(taskId),
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['tasks'] })
-    showSuccessToast(
-      toast,
-      'The API Request Successfully Sent Tho The Task Will Not Actually Be Deleted!',
-    )
+    queryClient.invalidateQueries(['tasks'])
+    showSuccessToast(toast, 'Task successfully deleted!')
+    closeWarningOverlay()
   },
   onError: () => {
-    showErrToast(toast, 'An Error Ocurred !')
+    showErrToast(toast, 'An error occurred while deleting the task!')
   },
 })
 
-const displayedTasks = computed(() => {
-  return data.value.length > 0 ? data.value : []
-})
+const displayedTasks = computed(() => data.value || [])
 </script>

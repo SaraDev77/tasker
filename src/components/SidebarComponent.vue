@@ -35,7 +35,7 @@
             <li class="w-full">
               <div
                 @click="toggleSection(!showFirstSection)"
-                class="p-4 flex items-center justify-between text-sky-500 dark:text-sky-400 cursor-pointer p-ripple"
+                class="p-4 flex items-center justify-between text-sky-500 dark:text-sky-400 cursor-pointer "
               >
                 <span class="text-xl font-semibold">Main</span>
                 <i class="pi pi-chevron-right" v-if="!showFirstSection"></i>
@@ -45,8 +45,8 @@
                 <RouterLink to="/">
                   <li class="w-full">
                     <a
-                      v-ripple
-                      class="flex items-center cursor-pointer p-4 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 transition-colors p-ripple"
+            
+                      class="flex items-center cursor-pointer p-4 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 "
                     >
                       <i class="pi pi-home mr-2"></i>
                       <span class="font-medium">Home</span>
@@ -56,8 +56,8 @@
                 <RouterLink to="/diagrams">
                   <li class="w-full">
                     <a
-                      v-ripple
-                      class="flex items-center cursor-pointer p-4 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 transition-colors p-ripple"
+         
+                      class="flex items-center cursor-pointer p-4 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 "
                     >
                       <i class="pi pi-chart-bar mr-2"></i>
                       <span class="font-medium">Diagrams</span>
@@ -74,7 +74,7 @@
       <hr class="mb-4 mx-4 border-t border-0 border-sky-200 dark:border-sky-700" />
       <a
         @click="signOut"
-        class="m-4 flex items-center cursor-pointer p-2 gap-2 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 transition-colors p-ripple"
+        class="m-4 flex items-center cursor-pointer p-2 gap-2 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 "
       >
         <i class="pi pi-sign-out text-sky-600"></i>
         <span class="font-bold">Log out</span>
