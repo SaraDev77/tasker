@@ -73,8 +73,8 @@ const props = defineProps<Task>()
 const cardColor = ref('')
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
-const taskState = ref('')
 const toast = useToast()
+const taskState = ref<typeof TaskActions[keyof typeof TaskActions] | null>(null)
 
 watchEffect(() => {
   switch (props.status) {
@@ -92,33 +92,62 @@ watchEffect(() => {
   }
 })
 
-const start = () => {
-  taskState.value = 'start'
-  mutate(props._id)
+const TaskActions = {
+  START: 'start',
+  COMPLETE: 'complete',
+} as const
+
+
+const handleTaskMutation = async (taskId: string, action: string) => {
+  switch (action) {
+    case TaskActions.START:
+      return tasksStore.startTask(taskId)
+    case TaskActions.COMPLETE:
+      return tasksStore.completeTask(taskId)
+    default:
+      throw new Error('Invalid task action')
+  }
 }
-const completed = () => {
-  taskState.value = 'complete'
-  mutate(props._id)
+
+const getToastMessage = (action: string) => {
+  switch (action) {
+    case TaskActions.COMPLETE:
+      return 'Wohooo You Completed One More Task 🎊🥳'
+    case TaskActions.START:
+      return 'Task Is Marked In Progress ⌛'
+    default:
+      return 'Action completed successfully!'
+  }
 }
+
 const { mutate } = useMutation({
-  mutationFn: () => {
-    if (taskState.value === 'complete') {
-      return tasksStore.completeTask(props._id)
-    } else if (taskState.value === 'start') {
-      return tasksStore.startTask(props._id)
-    }
-  },
+  mutationFn: () => handleTaskMutation(props._id, taskState.value!),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] })
-    showSuccessToast(
-      toast,
-      taskState.value === 'complete'
-        ? 'Wohooo You Completed One More Task 🎊🥳'
-        : 'Task Is Marked In Progress ⌛',
-    )
+    if (taskState.value) {
+      showSuccessToast(toast, getToastMessage(taskState.value))
+    }
   },
-  onError: () => {},
+  onError: () => {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: `Failed to update task`,
+      life: 5000,
+    })
+  },
 })
+
+const start = () => {
+  taskState.value = TaskActions.START
+  mutate()
+}
+
+const completed = () => {
+  taskState.value = TaskActions.COMPLETE
+  mutate()
+}
+
 
 const emit = defineEmits<{
   (e: 'deleteTask'): void

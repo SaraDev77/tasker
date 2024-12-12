@@ -48,7 +48,6 @@ import { addSchema } from '../../schemas/add-form.schema'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
-
 const statusOptions = Object.values(Status)
 const props = defineProps<{
   closeOverlay: () => void
