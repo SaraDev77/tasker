@@ -50,12 +50,11 @@ import { useTasksStore } from '../stores/tasks.store'
 import CardComponent from './CardComponent.vue'
 import type { Task } from '../models/task.type'
 import { computed, ref } from 'vue'
-import { useMutation, useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import OverlayComponent from './OverlayComponent.vue'
 import { useUrlSearchParams } from '@vueuse/core'
 import ToolbarComponent from './ToolbarComponent.vue'
 import { Button, useToast } from 'primevue'
-import { queryClient } from '../providers/queryClient'
 import { Status } from '../models/status.enum'
 import { showErrToast, showSuccessToast } from '../utils/show-toasts.util'
 import EditFormComponent from './form/EditFormComponent.vue'
@@ -72,7 +71,7 @@ const showOverlay = ref<boolean>(false)
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
 const toast = useToast()
-
+const queryClient=useQueryClient()
 const closeOverlay = () => {
   showOverlay.value = false
 }
