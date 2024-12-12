@@ -20,7 +20,7 @@
     <template #status>
       <Field name="status" as="select" :class="fieldStyle" v-model="formData.status">
         <option v-for="option in statusOptions" :key="option" :value="option">
-          {{ option.charAt(0).toUpperCase() + option.slice(1).toLowerCase().replace('_', ' ') }}
+          {{ formatStatus(option) }}
         </option>
       </Field>
       <ErrorMessage name="status" :class="errorStyle" />
@@ -33,7 +33,6 @@
 </template>
 
 <script lang="ts" setup>
-
 import { Status } from '@/models/status.enum'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import clsx from 'clsx'
@@ -46,6 +45,7 @@ import { editSchema } from '../../schemas/edit-form.schema'
 import { useTasksStore } from '../../stores/tasks.store'
 import { showErrToast, showSuccessToast } from '../../utils/show-toasts.util'
 import FormComponent from './FormComponent.vue'
+import { formatStatus } from '../../utils/format-status.util'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
@@ -68,10 +68,10 @@ const { mutate } = useMutation({
     tasksStore.updateTask(task, props.initialData?._id)
   },
   onSettled: () => {
-    queryClient.invalidateQueries('tasks');
+    queryClient.invalidateQueries('tasks')
   },
   onSuccess: () => {
-    queryClient.invalidateQueries('tasks');
+    queryClient.invalidateQueries('tasks')
     showSuccessToast(toast, 'Form Submitted Successfully!')
     setTimeout(() => {
       props.closeOverlay()

@@ -29,9 +29,7 @@
       <RouterLink :to="`/details/${props._id}`">
         <div class="min-w-full cursor-pointer">
           <p class="m-0 break-words whitespace-normal">
-            {{
-            formatStatus(props.status)
-            }}
+            {{ formatStatus(props.status) }}
           </p>
         </div>
       </RouterLink>
@@ -66,7 +64,7 @@ import { useTasksStore } from '../stores/tasks.store'
 import { useAuthStore } from '../stores/auth.store'
 import { vFormateDate } from '../custom-directives/date-formate.directive'
 import { showSuccessToast } from '../utils/show-toasts.util'
-import { formatStatus } from '../utils/format-enum.util'
+import { formatStatus } from '../utils/format-status.util'
 
 const queryClient = useQueryClient()
 const props = defineProps<Task>()
@@ -74,7 +72,7 @@ const cardColor = ref('')
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const taskState = ref<typeof TaskActions[keyof typeof TaskActions] | null>(null)
+const taskState = ref<(typeof TaskActions)[keyof typeof TaskActions] | null>(null)
 
 watchEffect(() => {
   switch (props.status) {
@@ -96,7 +94,6 @@ const TaskActions = {
   START: 'start',
   COMPLETE: 'complete',
 } as const
-
 
 const handleTaskMutation = async (taskId: string, action: string) => {
   switch (action) {
@@ -147,7 +144,6 @@ const completed = () => {
   taskState.value = TaskActions.COMPLETE
   mutate()
 }
-
 
 const emit = defineEmits<{
   (e: 'deleteTask'): void

@@ -20,7 +20,7 @@
     <template #status>
       <Field name="status" as="select" :class="fieldStyle" v-model="formData.status">
         <option v-for="option in statusOptions" :key="option" :value="option">
-          {{ option.charAt(0).toUpperCase() + option.slice(1).toLowerCase().replace('_', ' ') }}
+          {{ formatStatus(option) }}
         </option>
       </Field>
       <ErrorMessage name="status" :class="errorStyle" />
@@ -45,6 +45,7 @@ import { useTasksStore } from '../../stores/tasks.store'
 import { showErrToast, showSuccessToast } from '../../utils/show-toasts.util'
 import FormComponent from './FormComponent.vue'
 import { addSchema } from '../../schemas/add-form.schema'
+import { formatStatus } from '../../utils/format-status.util'
 
 const queryClient = useQueryClient()
 const tasksStore = useTasksStore()
