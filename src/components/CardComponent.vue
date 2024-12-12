@@ -157,4 +157,5 @@ const handlesDeleteClick = () => {
 const handlesEditClick = () => {
   emit('editTask')
 }
+
 </script>
