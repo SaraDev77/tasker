@@ -11,11 +11,15 @@ import { useAuthStore } from '../stores/auth.store'
 const routeGuard: NavigationGuard = async (to, from, next) => {
   const { id } = to.params
   try {
-    useTasksStore().fetchSingleTask(String(id))
-    next()
+    const response = await useTasksStore().fetchSingleTask(String(id));
+    if (response) {
+      next(); // Allow navigation if task is found
+    } else {
+      next({ name: 'not-found' }); // Redirect to 'not-found' if no task is found
+    }
   } catch (error) {
-    console.error('Invalid Task ID:', error)
-    next({ name: 'not-found' })
+    console.error('Invalid Task ID:', error);
+    next({ name: 'not-found' }); // Redirect to 'not-found' if an error occurs
   }
 }
 
@@ -54,7 +58,7 @@ const router = createRouter({
     },
     {
       name: 'not-found',
-      path: '/:catchAll(.*)',
+      path: '/:catchAll(.*)*',
       component: NotFound,
     },
   ],
