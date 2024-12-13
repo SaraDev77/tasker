@@ -1,5 +1,6 @@
 <template>
   <Card
+    v-overdue="task.deadline!"
     style="overflow: hidden"
     :class="[cardColor, 'border border-slate-400 !flex !flex-col !justify-between']"
   >
@@ -70,7 +71,7 @@ import { useAuthStore } from '../stores/auth.store'
 import { vFormateDate } from '../custom-directives/date-formate.directive'
 import { showSuccessToast } from '../utils/show-toasts.util'
 import { formatStatus } from '../utils/format-status.util'
-
+import { vOverdue } from '../custom-directives/overdue.directive'
 const queryClient = useQueryClient()
 const props = defineProps<{ task: Task; showActions: boolean }>()
 const cardColor = ref('')
