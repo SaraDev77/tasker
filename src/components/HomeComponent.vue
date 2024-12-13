@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
-  <LoaderComponent />
+    <LoaderComponent />
   </div>
   <div class="flex flex-col place-items-center lg:p-10 w-full p-5">
     <ToolbarComponent @search-tasks="onSearchTasks" />
@@ -11,20 +11,13 @@
       <CardComponent
         v-for="task in displayedTasks"
         :key="task._id"
-        :title="task.title"
-        :status="task.status"
-        :deadline="new Date(task.deadline)"
-        :description="task.description"
-        :created-by="task.createdBy"
-        :_id="task._id"
+        :task="task"
+        :showActions="true"
         @edit-task="displayEditOverlay(task)"
         @delete-task="displayWarningOverlay(task._id)"
       />
     </div>
-    <div
-      class="flex justify-center place-items-center"
-      v-else-if="!isLoading"
-    >
+    <div class="flex justify-center place-items-center" v-else-if="!isLoading">
       <h2 class="text-2xl text-gray-900 text-bold">No Tasks Match This Search!</h2>
     </div>
   </div>
@@ -37,8 +30,14 @@
         Are you sure you want to delete this task?
       </h1>
       <div class="flex gap-2">
-        <Button @click="confirmDelete" class="!bg-red-600 !border-none !px-9 hover:!bg-red-500">Yes</Button>
-        <Button class="!bg-gray-200 !text-gray-800 !border-none hover:!bg-gray-300" @click="closeWarningOverlay">Cancel</Button>
+        <Button @click="confirmDelete" class="!bg-red-600 !border-none !px-9 hover:!bg-red-500"
+          >Yes</Button
+        >
+        <Button
+          class="!bg-gray-200 !text-gray-800 !border-none hover:!bg-gray-300"
+          @click="closeWarningOverlay"
+          >Cancel</Button
+        >
       </div>
     </div>
   </OverlayComponent>
@@ -46,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { useTasksStore } from '../stores/tasks.store'
 import CardComponent from './CardComponent.vue'
 import type { Task } from '../models/task.type'
@@ -67,13 +65,13 @@ import LoaderComponent from './loader/LoaderComponent.vue'
 const params = useUrlSearchParams()
 const searchQuery = ref(params.search || '')
 const selectedTask = ref<Task | null>(null)
-const id = ref<string | null>(null)
+const selectedTaskId = ref<string | null>(null)
 const showWarningOverlay = ref<boolean>(false)
 const showOverlay = ref<boolean>(false)
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
 const toast = useToast()
-const queryClient=useQueryClient()
+const queryClient = useQueryClient()
 
 const closeEditOverlay = () => {
   showOverlay.value = false
@@ -89,7 +87,7 @@ const closeWarningOverlay = () => {
 }
 
 const displayWarningOverlay = (taskId: string) => {
-  id.value = taskId
+  selectedTaskId.value = taskId
   showWarningOverlay.value = true
 }
 
@@ -114,8 +112,8 @@ const { data, isLoading } = useQuery({
 })
 
 const confirmDelete = async () => {
-  if (!id.value) return
-  mutate(id.value)
+  if (!selectedTaskId.value) return
+  mutate(selectedTaskId.value)
 }
 
 const { mutate } = useMutation({

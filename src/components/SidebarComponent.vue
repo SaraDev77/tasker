@@ -48,7 +48,7 @@
             
                       class="flex items-center cursor-pointer p-4 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 "
                     >
-                      <i class="pi pi-home mr-2"></i>
+                      <i class="pi pi-home mr-2 text-green-700 "></i>
                       <span class="font-medium">Home</span>
                     </a>
                   </li></RouterLink
@@ -56,13 +56,25 @@
                 <RouterLink to="/diagrams">
                   <li class="w-full">
                     <a
-         
                       class="flex items-center cursor-pointer p-4 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 "
                     >
-                      <i class="pi pi-chart-bar mr-2"></i>
+                      <i class="pi pi-chart-bar mr-2 text-green-700 "></i>
                       <span class="font-medium">Diagrams</span>
                     </a>
                   </li></RouterLink
+                  
+                >
+                <RouterLink to="/board">
+                  <li class="w-full">
+                    <a
+         
+                      class="flex items-center cursor-pointer p-4 rounded text-sky-700 hover:bg-sky-100 dark:text-sky-0 dark:hover:bg-sky-800 duration-150 "
+                    >
+                      <i class="pi pi-clipboard mr-2 text-green-700 "></i>
+                      <span class="font-medium">Board</span>
+                    </a>
+                  </li></RouterLink
+                  
                 >
               </ul>
             </li>

@@ -7,6 +7,7 @@ import DiagramsView from '../views/DiagramsView.vue'
 import LoginView from '../views/auth/LoginView.vue'
 import RegisterView from '../views/auth/RegisterView.vue'
 import { useAuthStore } from '../stores/auth.store'
+import BoardView from '../views/BoardView.vue'
 
 const routeGuard: NavigationGuard = async (to, from, next) => {
   const { id } = to.params
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+    },
+    {
+      path: '/board',
+      name: 'board',
+      component: BoardView,
     },
     {
       path: '/diagrams',

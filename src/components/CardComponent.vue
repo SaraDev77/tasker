@@ -5,37 +5,42 @@
   >
     <template #title>
       <div class="flex justify-between">
-        {{ props.title }}
-        <div class="flex gap-2">
+        {{
+          props.task.title.length > 12
+            ? props.task.title.substring(0, 12) + '...'
+            : props.task.title
+        }}
+        <div v-if="props.showActions" class="flex gap-2">
           <i
             v-tooltip.top="'Make Task In Progress'"
             @click="start"
-            v-if="props.status === Status.PENDING"
+            v-if="props.task.status === Status.PENDING"
             class="pi pi-play-circle text-green-400 cursor-pointer"
           ></i>
           <i
             v-tooltip.top="'Mark As Completed'"
             @click="completed"
-            v-if="props.status !== Status.COMPLETED"
+            v-if="props.task.status !== Status.COMPLETED"
             class="pi pi-check-circle text-blue-600 cursor-pointer"
           ></i>
         </div>
+        <i v-if="!props.showActions" class="pi pi-thumbtack text-red-950"></i>
       </div>
     </template>
-    <template #subtitle
-      ><div v-formate-date="props.deadline!">{{ props.deadline || 'No Due Date' }}</div></template
-    >
-    <template #content v-if="props.status">
-      <RouterLink :to="`/details/${props._id}`">
+    <template #subtitle>
+      <div v-formate-date="props.task.deadline!">{{ props.task.deadline || 'No Due Date' }}</div>
+    </template>
+    <template #content v-if="props.task.status">
+      <RouterLink :to="`/details/${props.task._id}`">
         <div class="min-w-full cursor-pointer">
           <p class="m-0 break-words whitespace-normal">
-            {{ formatStatus(props.status) }}
+            {{ formatStatus(props.task.status) }}
           </p>
         </div>
       </RouterLink>
     </template>
     <template #footer>
-      <div class="flex gap-4 mt-2">
+      <div v-if="props.showActions" class="flex gap-4 mt-2">
         <Button
           label="Edit"
           class="w-full !bg-sky-700 hover:!bg-sky-600"
@@ -67,7 +72,7 @@ import { showSuccessToast } from '../utils/show-toasts.util'
 import { formatStatus } from '../utils/format-status.util'
 
 const queryClient = useQueryClient()
-const props = defineProps<Task>()
+const props = defineProps<{ task: Task; showActions: boolean }>()
 const cardColor = ref('')
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
@@ -75,7 +80,7 @@ const toast = useToast()
 const taskState = ref<(typeof TaskActions)[keyof typeof TaskActions] | null>(null)
 
 watchEffect(() => {
-  switch (props.status) {
+  switch (props.task.status) {
     case Status.COMPLETED:
       cardColor.value = '!bg-green-50'
       break
@@ -118,7 +123,7 @@ const getToastMessage = (action: string) => {
 }
 
 const { mutate } = useMutation({
-  mutationFn: () => handleTaskMutation(props._id, taskState.value!),
+  mutationFn: () => handleTaskMutation(props.task._id, taskState.value!),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] })
     if (taskState.value) {
@@ -157,5 +162,4 @@ const handlesDeleteClick = () => {
 const handlesEditClick = () => {
   emit('editTask')
 }
-
 </script>

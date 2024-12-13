@@ -9,7 +9,7 @@
     </template>
     <template #title>
       <Field name="title" :class="fieldStyle" v-model="formData.title" />
-      <ErrorMessage name="title" />
+      <ErrorMessage name="title" :class="errorStyle" />
     </template>
     <template #deadline>
       <Field name="deadline">
@@ -60,7 +60,7 @@ const formData = ref<TaskRequest>({
   deadline: props.initialData?.deadline,
   description: props.initialData?.description,
 })
-const parsed = editSchema.safeParse(formData.value)
+
 const toast = useToast()
 
 const { mutate } = useMutation({
@@ -68,10 +68,10 @@ const { mutate } = useMutation({
     tasksStore.updateTask(task, props.initialData?._id)
   },
   onSettled: () => {
-    queryClient.invalidateQueries('tasks')
+    queryClient.invalidateQueries({ queryKey: ['tasks'] })
   },
   onSuccess: () => {
-    queryClient.invalidateQueries('tasks')
+    queryClient.invalidateQueries({ queryKey: ['tasks'] })
     showSuccessToast(toast, 'Form Submitted Successfully!')
     setTimeout(() => {
       props.closeOverlay()
@@ -80,11 +80,11 @@ const { mutate } = useMutation({
 })
 
 const submitData = () => {
+  const parsed = editSchema.safeParse(formData.value)
   if (parsed.success) {
     mutate(formData.value)
   } else {
     showErrToast(toast, 'Form Submittion Failed!')
-    console.error((parsed.error.name = 'title'))
   }
 }
 
