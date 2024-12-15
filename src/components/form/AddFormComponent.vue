@@ -8,26 +8,50 @@
       <h1 class="font-bold text-xl text-slate-950 mb-4">Add New Task</h1>
     </template>
     <template #title>
-      <Field name="title" :class="fieldStyle" v-model="formData.title" />
-      <ErrorMessage name="title" :class="errorStyle" />
+      <Field
+        name="title"
+        class="w-full h-14 border border-slate-200 p-4 block rounded-md"
+        v-model="title"
+        v-bind="titleAttrs"
+      />
+      <p class="!text-red-500 !text-sm">{{ errors.title }}</p>
     </template>
     <template #deadline>
       <Field name="deadline">
-        <DatePicker v-model="formData.deadline" placeholder="select a deadline"></DatePicker>
+        <DatePicker
+          v-model="deadline"
+          v-bind="deadlineAttrs"
+          placeholder="select a deadline"
+          :min-date="today"
+        ></DatePicker>
       </Field>
-      <ErrorMessage name="deadline" :class="errorStyle" />
+      <p class="!text-red-500 !text-sm">{{ errors.deadline }}</p>
     </template>
     <template #status>
-      <Field name="status" as="select" :class="fieldStyle" v-model="formData.status">
-        <option v-for="option in statusOptions" :key="option" :value="option">
-          {{ formatStatus(option) }}
-        </option>
-      </Field>
-      <ErrorMessage name="status" :class="errorStyle" />
+      <div class="flex flex-col gap-2">
+        <label for="status" class="text-gray-800 text-lg my-2">Status</label>
+        <Field
+          name="status"
+          as="select"
+          class="w-full h-14 border border-slate-200 p-4 block rounded-md"
+          v-model="status"
+          v-bind="statusAttrs"
+        >
+          <option v-for="option in statusOptions" :key="option" :value="option">
+            {{ formatStatus(option) }}
+          </option>
+        </Field>
+        <p class="!text-red-500 !text-sm">{{ errors.status }}</p>
+      </div>
     </template>
     <template #description>
-      <Field name="description" :class="clsx(fieldStyle, '!h-24')" v-model="formData.description" />
-      <ErrorMessage name="description" :class="errorStyle" />
+      <Field
+        name="description"
+        :class="clsx('w-full h-14 border border-slate-200 p-4  block rounded-md', '!h-24')"
+        v-model="description"
+        v-bind="descriptionAttrs"
+      />
+      <p class="!text-red-500 !text-sm">{{ errors.description }}</p>
     </template>
   </FormComponent>
 </template>
@@ -38,34 +62,56 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import clsx from 'clsx'
 import { useToast } from 'primevue'
 import DatePicker from 'primevue/datepicker'
-import { ErrorMessage, Field } from 'vee-validate'
-import { ref } from 'vue'
+import { Field, useForm } from 'vee-validate'
+import { ref, watch } from 'vue'
 import type { Task, TaskRequest } from '../../models/task.type'
-import { useTasksStore } from '../../stores/tasks.store'
-import { showErrToast, showSuccessToast } from '../../utils/show-toasts.util'
+import { showErrToast, showSuccessToast } from '../../utils/showToasts.util'
 import FormComponent from './FormComponent.vue'
-import { addSchema } from '../../schemas/add-form.schema'
-import { formatStatus } from '../../utils/format-status.util'
+import { addSchema } from '../../schemas/addForm.schema'
+import { formatStatus } from '../../utils/formatStatus.util'
+import { toTypedSchema } from '@vee-validate/zod'
+import { taskService } from '../../utils/tasksRequests.util'
 
 const queryClient = useQueryClient()
-const tasksStore = useTasksStore()
 const statusOptions = Object.values(Status)
 const props = defineProps<{
   closeOverlay: () => void
 }>()
 const formData = ref<TaskRequest>({ title: '' })
 const toast = useToast()
+const today = new Date()
+const { errors, defineField, setFieldError } = useForm({
+  validationSchema: toTypedSchema(addSchema),
+  initialValues: formData.value,
+})
+const [title, titleAttrs] = defineField('title')
+const [description, descriptionAttrs] = defineField('description')
+const [status, statusAttrs] = defineField('status')
+const [deadline, deadlineAttrs] = defineField('deadline')
+
+watch(title, (newValue) => {
+  formData.value.title = newValue!
+})
+watch(description, (newValue) => {
+  formData.value.description = newValue
+})
+watch(status, (newValue) => {
+  formData.value.status = newValue as Status
+})
+watch(deadline as unknown as Date, (newValue: Date) => {
+  formData.value.deadline = newValue
+})
 
 const { mutate } = useMutation({
   mutationFn: (task: Task) => {
-    tasksStore.createTask(task)
+    taskService.createTask(task)
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] })
     showSuccessToast(toast, 'Form Submitted Successfully, Your Task Is Added Yay!')
     setTimeout(() => {
       props.closeOverlay()
-    }, 2000)
+    }, 1000)
   },
 })
 
@@ -74,11 +120,19 @@ const submitData = () => {
   if (parsed.success) {
     mutate(formData.value)
   } else {
-    showErrToast(toast, 'Form Submittion Failed!')
+    parsed.error.issues.forEach((issue) => {
+      const field = issue.path.join('.') as keyof typeof formData.value
+      if (
+        field === 'title' ||
+        field === 'description' ||
+        field === 'status' ||
+        field === 'deadline'
+      ) {
+        setFieldError(field, issue.message)
+      }
+    })
+    showErrToast(toast, 'Recheck Your Entered Data,Please!')
     console.error(parsed.error)
   }
 }
-
-const fieldStyle = 'w-full h-14 border border-slate-200 p-4  block rounded-md'
-const errorStyle = '!text-red-500 !text-sm'
 </script>

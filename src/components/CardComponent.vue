@@ -66,16 +66,15 @@ import { Button, Card, useToast } from 'primevue'
 import { ref, watchEffect } from 'vue'
 import { Status } from '../models/status.enum'
 import type { Task } from '../models/task.type'
-import { useTasksStore } from '../stores/tasks.store'
 import { useAuthStore } from '../stores/auth.store'
-import { vFormateDate } from '../custom-directives/date-formate.directive'
-import { showSuccessToast } from '../utils/show-toasts.util'
-import { formatStatus } from '../utils/format-status.util'
+import { vFormateDate } from '../custom-directives/dateFormate.directive'
+import { showSuccessToast } from '../utils/showToasts.util'
+import { formatStatus } from '../utils/formatStatus.util'
 import { vOverdue } from '../custom-directives/overdue.directive'
+import { taskService } from '../utils/tasksRequests.util'
 const queryClient = useQueryClient()
 const props = defineProps<{ task: Task; showActions: boolean }>()
 const cardColor = ref('')
-const tasksStore = useTasksStore()
 const authStore = useAuthStore()
 const toast = useToast()
 const taskState = ref<(typeof TaskActions)[keyof typeof TaskActions] | null>(null)
@@ -104,9 +103,9 @@ const TaskActions = {
 const handleTaskMutation = async (taskId: string, action: string) => {
   switch (action) {
     case TaskActions.START:
-      return tasksStore.startTask(taskId)
+      return taskService.startTask(taskId)
     case TaskActions.COMPLETE:
-      return tasksStore.completeTask(taskId)
+      return taskService.completeTask(taskId)
     default:
       throw new Error('Invalid task action')
   }

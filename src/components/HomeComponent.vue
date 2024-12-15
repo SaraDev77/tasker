@@ -6,10 +6,10 @@
     <ToolbarComponent @search-tasks="onSearchTasks" />
     <div
       class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 w-full"
-      v-if="displayedTasks.length > 0"
+      v-if="filteredTasks.length > 0"
     >
       <CardComponent
-        v-for="task in displayedTasks"
+        v-for="task in filteredTasks"
         :key="task._id"
         :task="task"
         :showActions="true"
@@ -45,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { useTasksStore } from '../stores/tasks.store'
 import CardComponent from './CardComponent.vue'
 import type { Task } from '../models/task.type'
 import { computed, ref } from 'vue'
@@ -55,12 +54,13 @@ import { useUrlSearchParams } from '@vueuse/core'
 import ToolbarComponent from './ToolbarComponent.vue'
 import { Button, useToast } from 'primevue'
 import { Status } from '../models/status.enum'
-import { showErrToast, showSuccessToast } from '../utils/show-toasts.util'
+import { showErrToast, showSuccessToast } from '../utils/showToasts.util'
 import EditFormComponent from './form/EditFormComponent.vue'
 import { useAuthStore } from '../stores/auth.store'
-import { UserRole } from '../models/user-role.enum'
+import { UserRole } from '../models/userRole.enum'
 import { useDebounceFn } from '@vueuse/core'
 import LoaderComponent from './loader/LoaderComponent.vue'
+import { taskService } from '../utils/tasksRequests.util'
 
 const params = useUrlSearchParams()
 const searchQuery = ref(params.search || '')
@@ -68,7 +68,6 @@ const selectedTask = ref<Task | null>(null)
 const selectedTaskId = ref<string | null>(null)
 const showWarningOverlay = ref<boolean>(false)
 const showOverlay = ref<boolean>(false)
-const tasksStore = useTasksStore()
 const authStore = useAuthStore()
 const toast = useToast()
 const queryClient = useQueryClient()
@@ -96,19 +95,22 @@ const onSearchTasks = useDebounceFn((value: string) => {
 }, 1000)
 
 const { data, isLoading } = useQuery({
-  queryKey: computed(() => ['tasks', searchQuery.value]),
-  queryFn: tasksStore.fetchTasks,
+  queryKey:['tasks'],
+  queryFn: taskService.fetchTasks,
   select: (data: Task[]) => {
-    const filteredTasks = searchQuery.value
-      ? data.filter((task) =>
-          task.title.toLowerCase().includes(searchQuery.value.toString().toLowerCase()),
-        )
-      : data
-
     return authStore.user?.role === UserRole.ADMIN
-      ? filteredTasks.filter((task) => task.status !== Status.COMPLETED)
-      : filteredTasks
+      ? data.filter((task) => task.status !== Status.COMPLETED)
+      : data
   },
+})
+
+const filteredTasks = computed(() => {
+  if (!data.value) return [] 
+  if (!searchQuery.value) return data.value 
+  const searchLowerCase = searchQuery.value.toString().toLowerCase()
+  return data.value.filter((task: Task) => 
+    task.title.toLowerCase().includes(searchLowerCase)
+  )
 })
 
 const confirmDelete = async () => {
@@ -117,7 +119,7 @@ const confirmDelete = async () => {
 }
 
 const { mutate } = useMutation({
-  mutationFn: async (taskId: string) => tasksStore.deleteTask(taskId),
+  mutationFn: async (taskId: string) => taskService.deleteTask(taskId),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] })
     showSuccessToast(toast, 'Task successfully deleted!')
@@ -128,5 +130,4 @@ const { mutate } = useMutation({
   },
 })
 
-const displayedTasks = computed(() => data.value || [])
 </script>

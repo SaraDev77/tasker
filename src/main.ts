@@ -8,11 +8,11 @@ import App from './App.vue'
 import router from './router'
 import { DialogService, Toast, ToastService } from 'primevue'
 import { VueQueryPlugin } from '@tanstack/vue-query'
-import Tooltip from 'primevue/tooltip';
+import Tooltip from 'primevue/tooltip'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { useAuthStore } from './stores/auth.store'
 import { abilitiesPlugin, Can } from '@casl/vue'
-import { vFormateDate } from './custom-directives/date-formate.directive'
+import { vFormateDate } from './custom-directives/dateFormate.directive'
 
 // Create the Vue app
 const app = createApp(App)
@@ -48,6 +48,6 @@ app.use(ToastService)
 // Register directives and components
 app.directive('formate-date', vFormateDate)
 app.component('ToastComponent', Toast)
-app.directive('tooltip', Tooltip);
+app.directive('tooltip', Tooltip)
 // Mount the app
 app.mount('#app')

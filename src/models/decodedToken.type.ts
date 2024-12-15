@@ -1,4 +1,4 @@
-import type { UserRole } from './user-role.enum'
+import type { UserRole } from './userRole.enum'
 
 export type DecodedToken = {
   role: UserRole

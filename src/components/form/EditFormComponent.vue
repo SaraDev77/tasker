@@ -8,48 +8,52 @@
       <h1 class="font-bold text-xl text-slate-950 mb-4">Edit Task</h1>
     </template>
     <template #title>
-      <Field name="title" :class="fieldStyle" v-model="formData.title" />
-      <ErrorMessage name="title" :class="errorStyle" />
+      <Field
+        name="title"
+        class="w-full h-14 border border-slate-200 p-4 block rounded-md"
+        v-model="title"
+        v-bind="titleAttrs"
+      />
+      <p class="text-red-500 text-sm">{{ errors.title }}</p>
     </template>
     <template #deadline>
       <Field name="deadline">
-        <DatePicker v-model="formData.deadline" placeholder="select a deadline"></DatePicker>
+        <DatePicker
+          v-model="formData.deadline"
+          placeholder="select a deadline"
+          :min-date="today"
+        ></DatePicker>
       </Field>
-      <ErrorMessage name="deadline" :class="errorStyle" />
-    </template>
-    <template #status>
-      <Field name="status" as="select" :class="fieldStyle" v-model="formData.status">
-        <option v-for="option in statusOptions" :key="option" :value="option">
-          {{ formatStatus(option) }}
-        </option>
-      </Field>
-      <ErrorMessage name="status" :class="errorStyle" />
+      <ErrorMessage name="deadline" class="text-red-500 text-sm" />
     </template>
     <template #description>
-      <Field name="description" :class="clsx(fieldStyle, '!h-24')" v-model="formData.description" />
-      <ErrorMessage name="description" :class="errorStyle" />
+      <Field
+        name="description"
+        class="w-full border border-slate-200 p-4 block rounded-md !h-24"
+        v-model="description"
+        v-bind="descriptionAttrs"
+      />
+      <p class="text-red-500 text-sm">{{ errors.description }}</p>
     </template>
   </FormComponent>
 </template>
 
 <script lang="ts" setup>
-import { Status } from '@/models/status.enum'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import clsx from 'clsx'
 import { useToast } from 'primevue'
 import DatePicker from 'primevue/datepicker'
-import { ErrorMessage, Field } from 'vee-validate'
-import { ref } from 'vue'
+import { ErrorMessage, Field, useForm } from 'vee-validate'
+import { ref, watch } from 'vue'
 import type { Task, TaskRequest } from '../../models/task.type'
-import { editSchema } from '../../schemas/edit-form.schema'
-import { useTasksStore } from '../../stores/tasks.store'
-import { showErrToast, showSuccessToast } from '../../utils/show-toasts.util'
+import { editSchema } from '../../schemas/editForm.schema'
+import { showErrToast, showSuccessToast } from '../../utils/showToasts.util'
 import FormComponent from './FormComponent.vue'
-import { formatStatus } from '../../utils/format-status.util'
+import { toTypedSchema } from '@vee-validate/zod'
+import { taskService } from '../../utils/tasksRequests.util'
 
 const queryClient = useQueryClient()
-const tasksStore = useTasksStore()
-const statusOptions = Object.values(Status)
+const toast = useToast()
+const today = new Date()
 const props = defineProps<{
   initialData: Task
   closeOverlay: () => void
@@ -60,22 +64,30 @@ const formData = ref<TaskRequest>({
   deadline: props.initialData?.deadline,
   description: props.initialData?.description,
 })
+const { errors, defineField, setFieldError } = useForm({
+  validationSchema: toTypedSchema(editSchema),
+  initialValues: formData.value,
+})
+const [title, titleAttrs] = defineField('title')
+const [description, descriptionAttrs] = defineField('description')
 
-const toast = useToast()
+watch(title, (newValue) => {
+  formData.value.title = newValue!
+})
+watch(description, (newValue) => {
+  formData.value.description = newValue
+})
 
 const { mutate } = useMutation({
   mutationFn: (task: Task) => {
-    tasksStore.updateTask(task, props.initialData?._id)
-  },
-  onSettled: () => {
-    queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    taskService.updateTask(task, props.initialData?._id)
   },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['tasks'] })
     showSuccessToast(toast, 'Form Submitted Successfully!')
     setTimeout(() => {
       props.closeOverlay()
-    }, 2000)
+    }, 1000)
   },
 })
 
@@ -84,10 +96,13 @@ const submitData = () => {
   if (parsed.success) {
     mutate(formData.value)
   } else {
-    showErrToast(toast, 'Form Submittion Failed!')
+    parsed.error.issues.forEach((issue) => {
+      const field = issue.path.join('.') as keyof typeof formData.value
+      if (field === 'title' || field === 'description' || field === 'status') {
+        setFieldError(field, issue.message)
+      }
+    })
+    showErrToast(toast, 'Recheck Your Entered Data ,Please!')
   }
 }
-
-const fieldStyle = 'w-full h-14 border border-slate-200 p-4  block rounded-md'
-const errorStyle = 'text-red-500 text-sm'
 </script>

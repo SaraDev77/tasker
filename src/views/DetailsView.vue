@@ -16,22 +16,21 @@
   >
 </template>
 <script lang="ts" setup>
-import { useTasksStore } from '../stores/tasks.store'
 import { useRoute } from 'vue-router'
 import { useQuery } from '@tanstack/vue-query'
 import LoaderComponent from '../components/loader/LoaderComponent.vue'
 import SplitComponent from '../components/SplitComponent.vue'
 import type { Task } from '../models/task.type'
-import { formatStatus } from '../utils/format-status.util'
+import { formatStatus } from '../utils/formatStatus.util'
 import { Fieldset } from 'primevue'
+import { taskService } from '../utils/tasksRequests.util'
 
 const route = useRoute()
 const taskId = route.params.id
-const taskStore = useTasksStore()
 
 const { data, isLoading } = useQuery({
   queryKey: ['tasks', taskId],
-  queryFn: () => taskStore.fetchSingleTask(String(taskId)),
+  queryFn: () => taskService.fetchSingleTask(String(taskId)),
   select: (data: Task) => {
     return {
       Title: data.title,

@@ -8,21 +8,31 @@
         </h2>
         <div class="flex flex-col gap-6">
           <div class="flex flex-col gap-2">
-            <label for="email" :class="labelStyle">Email</label>
-            <Field name="email" :class="fieldStyle" v-model="formInputs.email" />
-            <ErrorMessage name="email" :class="errorStyle" />
+            <label for="email" class="text-gray-800 text-lg my-2">Email</label>
+            <Field
+              name="email"
+              class="w-full h-14 border border-slate-200 p-4 block rounded-md"
+              v-model="email"
+              v-bind="emailAttrs"
+            />
+            <p class="text-red-500 text-sm">{{ errors.email }}</p>
           </div>
           <div class="flex flex-col gap-2">
-            <label for="password" :class="labelStyle">Password</label>
+            <label for="password" class="text-gray-800 text-lg my-2">Password</label>
             <Field
               name="password"
-              :class="fieldStyle"
+              class="w-full h-14 border border-slate-200 p-4 block rounded-md"
               type="password"
-              v-model="formInputs.password"
+              v-model="password"
+              v-bind="passwordAttrs"
             />
-            <ErrorMessage name="password" :class="errorStyle" />
+            <p class="text-red-500 text-sm">{{ errors.password }}</p>
           </div>
-          <Button class="!rounded-md !bg-sky-600 !border-none hover:!bg-sky-500" type="submit">
+          <Button
+            class="!rounded-md !bg-sky-600 !border-none hover:!bg-sky-500"
+            type="submit"
+            @click="userLogin"
+          >
             login
           </Button>
         </div>
@@ -36,12 +46,12 @@
 
 <script lang="ts" setup>
 import { Button, useToast } from 'primevue'
-import { Field, Form, ErrorMessage } from 'vee-validate'
+import { Field, Form, useForm } from 'vee-validate'
 import type { formData } from '../../models/auth.model'
-import { ref } from 'vue'
-import { showErrToast } from '../../utils/show-toasts.util'
+import { ref, watch } from 'vue'
+import { showErrToast } from '../../utils/showToasts.util'
 import { useAuthStore } from '../../stores/auth.store'
-import { authSchema } from '../../schemas/auth-form.schema'
+import { authSchema } from '../../schemas/authForm.schema'
 import { toTypedSchema } from '@vee-validate/zod'
 
 const formInputs = ref<formData>({ email: '', password: '' })
@@ -49,21 +59,39 @@ const toast = useToast()
 const authStore = useAuthStore()
 const validationSchema = toTypedSchema(authSchema)
 
+const { errors, defineField, setFieldError } = useForm({
+  validationSchema: toTypedSchema(authSchema),
+  initialValues: formInputs.value,
+})
+const [email, emailAttrs] = defineField('email')
+const [password, passwordAttrs] = defineField('password')
+
+watch(email, (newValue) => {
+  formInputs.value.email = newValue!
+})
+watch(password, (newValue) => {
+  formInputs.value.password = newValue!
+})
+
 const userLogin = async () => {
   try {
     const parsedData = authSchema.safeParse(formInputs.value)
-    if (!parsedData.success) {
-      const errorDetails = parsedData.error.errors.map((err) => err.message).join(', ')
-      return showErrToast(toast, `Validation Error: ${errorDetails}`)
+    if (parsedData.success) {
+      await authStore.login(formInputs.value)
+    } else {
+      parsedData.error.issues.forEach((issue) => {
+        const field = issue.path.join('.') as keyof typeof formInputs.value
+        setFieldError(field, issue.message)
+      })
+      const errorDetails = parsedData.error.issues.map((err) => err.message).join(', ')
+      showErrToast(toast, `Validation Error: ${errorDetails}`)
     }
-    await authStore.login(formInputs.value)
-  } catch (err) {
-    console.error('Authentication Error:', err)
-    showErrToast(toast, 'An unexpected error occurred during submission.')
+  } catch (err: unknown) {
+  if (err && typeof err === 'object' && 'response' in err) {
+    const responseErr = err as { response: { data: { message: string } } }; 
+    showErrToast(toast, responseErr.response.data.message);
+  } else {
+    showErrToast(toast, 'Unexpected error occurred.');
   }
-}
-
-const fieldStyle = 'w-full h-14 border border-slate-200 p-4  block rounded-md'
-const labelStyle = 'text-gray-800 text-lg my-2'
-const errorStyle = 'text-red-500 text-sm'
+  }}
 </script>

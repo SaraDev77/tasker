@@ -27,13 +27,13 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useTasksStore } from '../stores/tasks.store'
 import { useQuery } from '@tanstack/vue-query'
 import Chart from 'primevue/chart'
 import LoaderComponent from '../components/loader/LoaderComponent.vue'
 import type { Task } from '../models/task.type'
 import { Status } from '../models/status.enum'
 import { Splitter, SplitterPanel } from 'primevue'
+import { taskService } from '../utils/tasksRequests.util'
 
 interface Dataset {
   label: string
@@ -59,11 +59,10 @@ const barChartData = ref<ChartData>({
 
 const chartOptions = ref({})
 const barChartOptions = ref({})
-const tasksStore = useTasksStore()
 
 const { data: tasks, isLoading } = useQuery({
   queryKey: ['tasks'],
-  queryFn: tasksStore.fetchTasks,
+  queryFn: taskService.fetchTasks,
 })
 
 const computedChartData = computed(() => {

@@ -3,16 +3,18 @@ import { useQuery } from '@tanstack/vue-query'
 import BoardComponent from '../components/BoardComponent.vue'
 import CardComponent from '../components/CardComponent.vue'
 import type { Task } from '../models/task.type'
-import { useTasksStore } from '../stores/tasks.store'
 import { Status } from '../models/status.enum'
 import { computed } from 'vue'
 import LoaderComponent from '../components/loader/LoaderComponent.vue'
+import { useAuthStore } from '../stores/auth.store'
+import { UserRole } from '../models/userRole.enum'
+import { taskService } from '../utils/tasksRequests.util'
 
-const tasksStore = useTasksStore()
+const authStore = useAuthStore()
 
-const { data ,isLoading} = useQuery({
+const { data, isLoading } = useQuery({
   queryKey: ['tasks'],
-  queryFn: tasksStore.fetchTasks,
+  queryFn: taskService.fetchTasks,
   select: (data: Task[]) => {
     const categorizedTasks: {
       pendingTasks: Task[]
@@ -44,18 +46,24 @@ const boardsData = computed(() => {
   }
 
   return [
-    { title: "Pending Tasks", bgColor: "!bg-sky-100", tasks: tasks.pendingTasks },
-    { title: "In Progress Tasks", bgColor: "!bg-yellow-100", tasks: tasks.inProgressTasks },
-    { title: "Done Tasks", bgColor: "!bg-green-300", tasks: tasks.doneTasks },
-  ]
+    { title: 'Pending Tasks', bgColor: '!bg-sky-100', tasks: tasks.pendingTasks },
+    { title: 'In Progress Tasks', bgColor: '!bg-yellow-100', tasks: tasks.inProgressTasks },
+    !(authStore.user?.role === UserRole.SUPER_ADMIN)
+      ? {
+          title: '',
+          bgColor: '',
+          tasks: [],
+        }
+      : { title: 'Done Tasks', bgColor: '!bg-green-300', tasks: tasks.doneTasks },
+  ].filter((board) => board.tasks.length > 0)
 })
 </script>
 
 <template>
-    <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
+  <div v-if="isLoading" class="min-h-full min-w-full flex justify-center place-items-center">
     <LoaderComponent />
   </div>
-  <div v-else class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
+  <div v-else class="flex flex-wrap gap-4 justify-center ">
     <BoardComponent
       v-for="(board, index) in boardsData"
       :key="index"

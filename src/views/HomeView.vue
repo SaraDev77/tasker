@@ -4,7 +4,7 @@ import { Message } from 'primevue'
 import HomeComponent from '../components/HomeComponent.vue'
 import KnobComponent from '../components/KnobComponent.vue'
 import { useAuthStore } from '../stores/auth.store'
-import { UserRole } from '../models/user-role.enum'
+import { UserRole } from '../models/userRole.enum'
 
 const showWarning = ref(false)
 const authStore = useAuthStore()
